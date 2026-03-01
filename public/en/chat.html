@@ -4322,7 +4322,7 @@ Your satisfaction matters to us.
                             </div>
                             <div style="flex: 1; min-width: 100px;">
                                 <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">Time</label>
-                                <select id="scheduleTime" style="width: 100%; padding: 10px; border: 2px solid var(--border); border-radius: 8px; font-size: 14px;">
+                                <select id="autoPublishTime" style="width: 100%; padding: 10px; border: 2px solid var(--border); border-radius: 8px; font-size: 14px;">
                                     <option value="10:00" selected>10:00 AM</option>
                                     <option value="14:00">2:00 PM</option>
                                 </select>
@@ -4351,7 +4351,7 @@ Your satisfaction matters to us.
             const cycle = parseInt(document.getElementById('scheduleCycle').value);
             const platform = document.getElementById('schedulePlatform').value;
             const day = parseInt(document.getElementById('scheduleDay').value);
-            const time = document.getElementById('scheduleTime').value;
+            const time = document.getElementById('autoPublishTime').value;
             const biz = window.businessInfo || { name: 'Your Business', trade: 'plumber', location: 'Austin, TX', phone: '(555) 123-4567' };
 
             const platformColors = { google: '#4285F4', facebook: '#1877F2', nextdoor: '#8BC34A' };
@@ -4429,7 +4429,47 @@ Your satisfaction matters to us.
         }
 
         function editScheduledPost(idx) {
-            showToast('✏️ Opening editor for post ' + (idx + 1));
+            const topic = autoPostTopics[idx % autoPostTopics.length];
+            const biz = window.businessInfo || { name: 'Your Business', trade: 'plumber', location: 'Austin, TX', phone: '(555) 123-4567' };
+            const content = `${topic.icon} ${topic.title}\n\n${topic.content}\n\nPerfect for ${biz.location.split(',')[0]} homeowners!\n\nCall us: ${biz.phone}`;
+
+            const modal = document.createElement('div');
+            modal.className = 'publish-modal show';
+            modal.id = 'editScheduledModal';
+            modal.innerHTML = `
+                <div class="publish-dialog" style="max-width: 600px;">
+                    <h3>✏️ Edit Week ${idx + 1} Post</h3>
+                    <div style="margin: 20px 0;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">Title</label>
+                        <input type="text" id="editPostTitle" value="${topic.title}" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 14px; margin-bottom: 16px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">Content</label>
+                        <textarea id="editPostContent" style="width: 100%; height: 150px; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 14px; line-height: 1.6; resize: vertical;">${content}</textarea>
+                    </div>
+                    <div class="actions" style="display: flex; gap: 12px;">
+                        <button onclick="closeScheduledEditModal()" style="flex: 1; padding: 12px; background: var(--bg); border: none; border-radius: 8px; cursor: pointer;">Cancel</button>
+                        <button onclick="saveScheduledEdit(${idx})" style="flex: 1; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">💾 Save</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function closeScheduledEditModal() {
+            const modal = document.getElementById('editScheduledModal');
+            if (modal) modal.remove();
+        }
+
+        function saveScheduledEdit(idx) {
+            const title = document.getElementById('editPostTitle').value;
+            const content = document.getElementById('editPostContent').value;
+            autoPostTopics[idx % autoPostTopics.length] = {
+                ...autoPostTopics[idx % autoPostTopics.length],
+                title: title,
+                content: content.split('\n')[2] || content
+            };
+            closeScheduledEditModal();
+            showToast('✅ Post updated!');
+            generatePostsList();
         }
 
         function regeneratePost(idx) {
@@ -4446,7 +4486,7 @@ Your satisfaction matters to us.
             const cycle = document.getElementById('scheduleCycle').value;
             const platform = document.getElementById('schedulePlatform').value;
             const day = document.getElementById('scheduleDay').value;
-            const time = document.getElementById('scheduleTime').value;
+            const time = document.getElementById('autoPublishTime').value;
 
             const schedule = {
                 platform,
