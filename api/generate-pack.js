@@ -162,45 +162,59 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
     console.log('AI returned images:', contentPack.images);
     contentPack.images = {};
 
-    // Generate images using Imagen 4.0 API (same as generate-image.js)
-    try {
-      console.log('Calling Imagen 4.0 API...');
-      const imgResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            instances: [{ prompt: imagePrompt }],
-            parameters: {
-              sampleCount: 1,
-              aspectRatio: '1:1',
-              personGeneration: 'allow_adult'
-            }
-          }),
-        }
-      );
+    // Platform-specific aspect ratios
+    const platformAspects = {
+      google: '4:3',
+      nextdoor: '16:9',
+      facebook: '1:1'
+    };
 
-      console.log('Imagen response status:', imgResponse.status);
-
-      if (imgResponse.ok) {
-        const imgData = await imgResponse.json();
-        const base64 = imgData.predictions?.[0]?.bytesBase64Encoded;
-        if (base64) {
-          contentPack.images.google = `data:image/png;base64,${base64}`;
-          contentPack.images.nextdoor = contentPack.images.google;
-          contentPack.images.facebook = contentPack.images.google;
-          console.log('Imagen SUCCESS - image generated');
+    // Generate images for each platform with correct aspect ratio
+    async function generateImage(prompt, aspectRatio) {
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              instances: [{ prompt }],
+              parameters: {
+                sampleCount: 1,
+                aspectRatio: aspectRatio,
+                personGeneration: 'allow_adult'
+              }
+            }),
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          const base64 = data.predictions?.[0]?.bytesBase64Encoded;
+          if (base64) return `data:image/png;base64,${base64}`;
         }
-      } else {
-        const errorText = await imgResponse.text();
-        console.error('Imagen error:', errorText);
+      } catch (e) {
+        console.error('Image generation error:', e);
       }
-    } catch (e) {
-      console.error('Image generation failed:', e);
+      return null;
     }
 
-    console.log('Image result:', contentPack.images.google ? 'AI generated' : 'Using fallback');
+    // Generate images in parallel for all platforms
+    console.log('Generating images for all platforms...');
+    const [googleImg, nextdoorImg, facebookImg] = await Promise.all([
+      generateImage(imagePrompt, platformAspects.google),
+      generateImage(imagePrompt, platformAspects.nextdoor),
+      generateImage(imagePrompt, platformAspects.facebook)
+    ]);
+
+    contentPack.images.google = googleImg;
+    contentPack.images.nextdoor = nextdoorImg;
+    contentPack.images.facebook = facebookImg;
+
+    console.log('Images generated:', {
+      google: !!googleImg,
+      nextdoor: !!nextdoorImg,
+      facebook: !!facebookImg
+    });
 
     // Fallback - use Topic + Trade based image selection
     if (!contentPack.images.google) {
