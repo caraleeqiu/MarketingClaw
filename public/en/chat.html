@@ -3911,6 +3911,13 @@ Your satisfaction matters to us.
             link.click();
         }
 
+        // Platform-specific image styles
+        const platformImageStyles = {
+            google: 'professional business photo, clean background, trust and reliability, Google Business Profile style',
+            facebook: 'engaging social media photo, warm and friendly, lifestyle feel, Facebook post style, square format',
+            nextdoor: 'neighborly community photo, local business feel, approachable, outdoor residential setting'
+        };
+
         // Regenerate image for a specific platform
         async function regenerateImage(platform) {
             const pack = window.generatedContent?.pack;
@@ -3926,17 +3933,22 @@ Your satisfaction matters to us.
             showToast('🔄 正在生成新图片...');
 
             try {
-                // Build a varied prompt for different results
+                // Platform-specific style
+                const platformStyle = platformImageStyles[platform] || platformImageStyles.google;
+
+                // Random variation for different results each time
                 const variations = [
-                    'close-up detail shot',
-                    'wide angle environmental shot',
-                    'action shot with motion',
-                    'portrait style with bokeh background',
-                    'bright and airy aesthetic'
+                    'morning golden hour lighting',
+                    'bright midday natural light',
+                    'warm afternoon glow',
+                    'soft diffused lighting',
+                    'dramatic professional lighting'
                 ];
                 const randomVariation = variations[Math.floor(Math.random() * variations.length)];
 
-                const prompt = `Professional ${biz.trade} marketing photo for ${topic}. Style: ${randomVariation}, high-end commercial photography, warm natural lighting, 4K quality`;
+                const prompt = `Professional ${biz.trade} marketing photo for ${topic}. ${platformStyle}. Lighting: ${randomVariation}, high-end commercial photography, 4K quality`;
+
+                console.log(`Regenerating ${platform} image:`, prompt);
 
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 30000);
@@ -3953,17 +3965,12 @@ Your satisfaction matters to us.
                 const data = await response.json();
 
                 if (data.success && data.image) {
-                    // Update the image in the pack
+                    // Only update this specific platform's image
                     pack.images[platform] = data.image;
-
-                    // Update all platform images to the new one (they share the same image)
-                    pack.images.google = data.image;
-                    pack.images.facebook = data.image;
-                    pack.images.nextdoor = data.image;
 
                     // Re-render the content
                     displayContentPack(pack);
-                    showToast('✅ 图片已更新!');
+                    showToast('✅ ' + platform + ' 图片已更新!');
                 } else {
                     showToast('❌ 生成失败，请重试');
                 }
