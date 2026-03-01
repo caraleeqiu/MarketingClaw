@@ -150,25 +150,38 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
     // Build image prompt from ACTUAL generated content
     // Create a topic-focused, visually appealing image prompt
     const topicLower = topic.toLowerCase();
+    const trade = business.trade || 'plumber';
+
+    // Trade-specific visual keywords to help AI understand the profession
+    const tradeKeywords = {
+      plumber: 'plumber with pipes, wrenches, water fixtures, plumbing tools',
+      electrician: 'electrician with electrical panel, wires, circuit breaker, voltage tester',
+      hvac: 'HVAC technician with air conditioning unit, ductwork, thermostat',
+      roofer: 'roofer on roof with shingles, roofing tools, ladder',
+      landscaper: 'landscaper with plants, lawn mower, garden tools',
+      realtor: 'real estate agent with house keys, property listing, home exterior'
+    };
+    const tradeVisuals = tradeKeywords[trade] || tradeKeywords.plumber;
+
     let sceneDescription = '';
 
     // Topic-specific scenes with better visual appeal
     if (topicLower.includes('spring') || topicLower.includes('inspect')) {
-      sceneDescription = `professional ${business.trade} in clean uniform inspecting home exterior on beautiful spring day, blooming flowers in background, bright natural sunlight, homeowner watching satisfied`;
+      sceneDescription = `professional ${tradeVisuals}, inspecting home exterior on beautiful spring day, blooming flowers in background, bright natural sunlight, homeowner watching satisfied`;
     } else if (topicLower.includes('emergency') || topicLower.includes('urgent') || topicLower.includes('24')) {
-      sceneDescription = `heroic ${business.trade} arriving at night with professional van, dramatic lighting, ready to help, trustworthy and reliable appearance`;
+      sceneDescription = `heroic ${tradeVisuals}, arriving for emergency service, dramatic lighting, ready to help, trustworthy and reliable appearance`;
     } else if (topicLower.includes('discount') || topicLower.includes('off') || topicLower.includes('special') || topicLower.includes('save')) {
-      sceneDescription = `smiling ${business.trade} in branded uniform holding tools, bright cheerful setting, clean modern home background, welcoming and friendly`;
+      sceneDescription = `smiling ${tradeVisuals}, in branded uniform, bright cheerful setting, clean modern home background, welcoming and friendly`;
     } else if (topicLower.includes('safety') || topicLower.includes('tip') || topicLower.includes('guide')) {
-      sceneDescription = `${business.trade} explaining equipment to attentive homeowner, educational moment, clean organized workspace, professional consultation`;
+      sceneDescription = `${tradeVisuals}, explaining equipment to attentive homeowner, educational moment, clean organized workspace, professional consultation`;
     } else if (topicLower.includes('winter') || topicLower.includes('freeze') || topicLower.includes('cold')) {
-      sceneDescription = `${business.trade} protecting home pipes with insulation, cozy winter scene, warm indoor lighting, prevention and care theme`;
+      sceneDescription = `${tradeVisuals}, protecting home systems, cozy winter scene, warm indoor lighting, prevention and care theme`;
     } else if (topicLower.includes('summer') || topicLower.includes('heat') || topicLower.includes('cool')) {
-      sceneDescription = `${business.trade} servicing AC unit on sunny day, refreshing cool air theme, satisfied homeowner in background, summer comfort`;
+      sceneDescription = `${tradeVisuals}, servicing equipment on sunny day, refreshing atmosphere, satisfied homeowner in background, summer comfort`;
     } else if (topicLower.includes('new') || topicLower.includes('install') || topicLower.includes('upgrade')) {
-      sceneDescription = `${business.trade} proudly showing newly installed modern equipment, gleaming new installation, impressed homeowner, quality craftsmanship`;
+      sceneDescription = `${tradeVisuals}, proudly showing newly installed modern equipment, gleaming new installation, impressed homeowner, quality craftsmanship`;
     } else {
-      sceneDescription = `professional ${business.trade} at work in beautiful modern home, excellent craftsmanship, satisfied customer interaction`;
+      sceneDescription = `professional ${tradeVisuals}, at work in beautiful modern home, excellent craftsmanship, satisfied customer interaction`;
     }
 
     // Build final prompt with high-quality marketing style
@@ -181,9 +194,11 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
     console.log('AI returned images:', contentPack.images);
     contentPack.images = {};
 
-    // Generate ONE image (1:1 square) - frontend will crop for different platforms
-    // This is faster and reduces response size from ~5MB to ~1.7MB
+    // Generate image with Google Business aspect ratio (4:3) as primary
+    // Frontend will display same image but styled for each platform
     console.log('Generating AI image...');
+    console.log('Trade:', trade, 'Topic:', topic);
+    console.log('Image prompt:', imagePrompt);
     try {
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=${apiKey}`,
@@ -194,7 +209,7 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
             instances: [{ prompt: imagePrompt }],
             parameters: {
               sampleCount: 1,
-              aspectRatio: '1:1',
+              aspectRatio: '4:3',
               personGeneration: 'allow_adult'
             }
           }),
