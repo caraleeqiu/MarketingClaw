@@ -162,59 +162,43 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
     console.log('AI returned images:', contentPack.images);
     contentPack.images = {};
 
-    // Platform-specific aspect ratios
-    const platformAspects = {
-      google: '4:3',
-      nextdoor: '16:9',
-      facebook: '1:1'
-    };
-
-    // Generate images for each platform with correct aspect ratio
-    async function generateImage(prompt, aspectRatio) {
-      try {
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              instances: [{ prompt }],
-              parameters: {
-                sampleCount: 1,
-                aspectRatio: aspectRatio,
-                personGeneration: 'allow_adult'
-              }
-            }),
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          const base64 = data.predictions?.[0]?.bytesBase64Encoded;
-          if (base64) return `data:image/png;base64,${base64}`;
+    // Generate ONE image (1:1 square) - frontend will crop for different platforms
+    // This is faster and reduces response size from ~5MB to ~1.7MB
+    console.log('Generating AI image...');
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            instances: [{ prompt: imagePrompt }],
+            parameters: {
+              sampleCount: 1,
+              aspectRatio: '1:1',
+              personGeneration: 'allow_adult'
+            }
+          }),
         }
-      } catch (e) {
-        console.error('Image generation error:', e);
+      );
+      if (response.ok) {
+        const data = await response.json();
+        const base64 = data.predictions?.[0]?.bytesBase64Encoded;
+        if (base64) {
+          const imageUrl = `data:image/png;base64,${base64}`;
+          contentPack.images.google = imageUrl;
+          contentPack.images.nextdoor = imageUrl;
+          contentPack.images.facebook = imageUrl;
+          console.log('Imagen SUCCESS');
+        }
+      } else {
+        console.error('Imagen error:', await response.text());
       }
-      return null;
+    } catch (e) {
+      console.error('Image generation error:', e);
     }
 
-    // Generate images in parallel for all platforms
-    console.log('Generating images for all platforms...');
-    const [googleImg, nextdoorImg, facebookImg] = await Promise.all([
-      generateImage(imagePrompt, platformAspects.google),
-      generateImage(imagePrompt, platformAspects.nextdoor),
-      generateImage(imagePrompt, platformAspects.facebook)
-    ]);
-
-    contentPack.images.google = googleImg;
-    contentPack.images.nextdoor = nextdoorImg;
-    contentPack.images.facebook = facebookImg;
-
-    console.log('Images generated:', {
-      google: !!googleImg,
-      nextdoor: !!nextdoorImg,
-      facebook: !!facebookImg
-    });
+    console.log('Image generated:', !!contentPack.images.google);
 
     // Fallback - use Topic + Trade based image selection
     if (!contentPack.images.google) {
