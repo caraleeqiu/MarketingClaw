@@ -3542,7 +3542,7 @@ For example: "Austin, TX 78704"`);
                             name: biz.name,
                             trade: biz.trade,
                             location: biz.location,
-                            zip: biz.location.match(/\d{5}/)?.[0] || '98104',
+                            zip: biz.location?.match(/\d{5}/)?.[0] || '',
                             phone: biz.phone
                         },
                         topic: topic
@@ -3920,21 +3920,20 @@ Your satisfaction matters to us.
             setTimeout(() => toast.remove(), 2000);
         }
 
-        // Quick Generate with demo data
+        // Quick Generate - uses actual businessInfo if available
         function quickGenerate() {
             const welcome = document.querySelector('.welcome');
             if (welcome) welcome.remove();
 
-            generateContentPack(
-                {
-                    name: "Mike's Plumbing",
-                    trade: "plumber",
-                    location: "Austin, TX",
-                    zip: "78704",
-                    phone: "512-555-1234"
-                },
-                "Winter pipe freeze prevention tips and $79 inspection special"
-            );
+            // Use actual business info if available, otherwise prompt user
+            const biz = window.businessInfo;
+            if (!biz || !biz.name) {
+                addChatBubble('assistant', '⚠️ Please tell me about your business first. What trade are you in and where are you located?');
+                return;
+            }
+
+            const topic = window.selectedTopicTitle || 'Spring maintenance tips';
+            generateContentPack(biz, topic);
         }
 
         // ========== PREVIEW MODAL ==========
