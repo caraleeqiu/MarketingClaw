@@ -58,7 +58,7 @@ export default async function handler(req) {
           parameters: {
             sampleCount: 1,
             aspectRatio: aspectRatio,
-            personGeneration: 'dont_allow'  // Safer for marketing
+            personGeneration: 'allow_adult'  // Allow professional workers in marketing photos
           }
         }),
       }
