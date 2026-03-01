@@ -2453,6 +2453,7 @@
                         </div>
                     </div>
                     <div class="preview-actions" style="display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid #dadce0;">
+                        <button onclick="regenerateImage('google')" id="regen-btn-google" style="padding: 10px; background: #fff3e0; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">🔄 换图</button>
                         <button onclick="openEditModal('google')" style="flex: 1; padding: 10px; background: #f1f3f4; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">✏️ Edit</button>
                         <button onclick="copyPlatformContent('google')" style="flex: 1; padding: 10px; background: #f1f3f4; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">📋 Copy</button>
                         <button onclick="openPublishModal('google')" style="flex: 1; padding: 10px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">🚀 Publish</button>
@@ -2567,6 +2568,7 @@
                         <div class="fb-action">↗️ Share</div>
                     </div>
                     <div class="preview-actions">
+                        <button style="background: #fff3e0;" onclick="event.stopPropagation(); regenerateImage('facebook')">🔄 换图</button>
                         <button class="btn-edit" onclick="event.stopPropagation(); openEditModal('facebook')">✏️ Edit</button>
                         <button class="btn-publish-sm" onclick="event.stopPropagation(); quickPublish('facebook')">🚀 Publish</button>
                     </div>
@@ -2595,6 +2597,7 @@
                     <img class="nd-image" src="${image}" alt="Post image" style="aspect-ratio: 16/9;" onerror="this.src='${fallbackImages[trade] || fallbackImages.default}'">
                     <div class="nd-content" style="white-space: pre-line;">${text}</div>
                     <div class="preview-actions">
+                        <button style="background: #fff3e0;" onclick="event.stopPropagation(); regenerateImage('nextdoor')">🔄 换图</button>
                         <button class="btn-edit" onclick="event.stopPropagation(); openEditModal('nextdoor')">✏️ Edit</button>
                         <button class="btn-publish-sm" onclick="event.stopPropagation(); quickPublish('nextdoor')">🚀 Publish</button>
                     </div>
@@ -3906,6 +3909,72 @@ Your satisfaction matters to us.
             link.href = imageUrl;
             link.download = `marketingclaw-${platform}.png`;
             link.click();
+        }
+
+        // Regenerate image for a specific platform
+        async function regenerateImage(platform) {
+            const pack = window.generatedContent?.pack;
+            const biz = window.businessInfo;
+            const topic = window.selectedTopicTitle || 'professional service';
+
+            if (!pack || !biz) {
+                showToast('No content available');
+                return;
+            }
+
+            // Show loading state
+            showToast('🔄 正在生成新图片...');
+
+            try {
+                // Build a varied prompt for different results
+                const variations = [
+                    'close-up detail shot',
+                    'wide angle environmental shot',
+                    'action shot with motion',
+                    'portrait style with bokeh background',
+                    'bright and airy aesthetic'
+                ];
+                const randomVariation = variations[Math.floor(Math.random() * variations.length)];
+
+                const prompt = `Professional ${biz.trade} marketing photo for ${topic}. Style: ${randomVariation}, high-end commercial photography, warm natural lighting, 4K quality`;
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+                const response = await fetch('/api/generate-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt, platform }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                const data = await response.json();
+
+                if (data.success && data.image) {
+                    // Update the image in the pack
+                    pack.images[platform] = data.image;
+
+                    // Update all platform images to the new one (they share the same image)
+                    pack.images.google = data.image;
+                    pack.images.facebook = data.image;
+                    pack.images.nextdoor = data.image;
+
+                    // Re-render the content
+                    displayContentPack(pack);
+                    showToast('✅ 图片已更新!');
+                } else {
+                    showToast('❌ 生成失败，请重试');
+                }
+            } catch (error) {
+                console.error('Regenerate image error:', error);
+                if (error.name === 'AbortError') {
+                    showToast('❌ 请求超时，请重试');
+                } else {
+                    showToast('❌ 生成失败: ' + error.message);
+                }
+            }
         }
 
         function showToast(message) {

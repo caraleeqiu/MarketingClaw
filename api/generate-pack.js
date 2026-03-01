@@ -148,36 +148,31 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
     }
 
     // Build image prompt from ACTUAL generated content
-    // Extract key themes from the generated post content
-    const googleContent = contentPack.platforms?.google?.content || '';
-    const googleTitle = contentPack.platforms?.google?.title || '';
+    // Create a topic-focused, visually appealing image prompt
+    const topicLower = topic.toLowerCase();
+    let sceneDescription = '';
 
-    // Create a topic-focused image prompt
-    // Priority: AI-generated imagePrompt > topic-based fallback
-    let imagePrompt = contentPack.imagePrompt;
-
-    // If AI didn't provide a good prompt, create one based on topic
-    if (!imagePrompt || imagePrompt.includes('[trade]') || imagePrompt.length < 20) {
-      // Extract topic keywords for better image matching
-      const topicLower = topic.toLowerCase();
-      let sceneDescription = '';
-
-      if (topicLower.includes('spring') || topicLower.includes('inspect')) {
-        sceneDescription = `${business.trade} performing spring inspection, checking outdoor equipment, sunny day, garden visible`;
-      } else if (topicLower.includes('emergency') || topicLower.includes('urgent')) {
-        sceneDescription = `${business.trade} responding to emergency call, professional tools ready, urgent action scene`;
-      } else if (topicLower.includes('discount') || topicLower.includes('off') || topicLower.includes('special')) {
-        sceneDescription = `friendly ${business.trade} giving thumbs up, professional uniform, welcoming smile, promotional feel`;
-      } else if (topicLower.includes('safety') || topicLower.includes('tip')) {
-        sceneDescription = `${business.trade} demonstrating safety check, educational setting, pointing at equipment`;
-      } else if (topicLower.includes('winter') || topicLower.includes('freeze')) {
-        sceneDescription = `${business.trade} winterizing pipes, cold weather protection, insulation visible`;
-      } else {
-        sceneDescription = `professional ${business.trade} at work, ${googleTitle}, high quality service`;
-      }
-
-      imagePrompt = `Professional marketing photo: ${sceneDescription}. Style: clean, modern, trustworthy, warm lighting.`;
+    // Topic-specific scenes with better visual appeal
+    if (topicLower.includes('spring') || topicLower.includes('inspect')) {
+      sceneDescription = `professional ${business.trade} in clean uniform inspecting home exterior on beautiful spring day, blooming flowers in background, bright natural sunlight, homeowner watching satisfied`;
+    } else if (topicLower.includes('emergency') || topicLower.includes('urgent') || topicLower.includes('24')) {
+      sceneDescription = `heroic ${business.trade} arriving at night with professional van, dramatic lighting, ready to help, trustworthy and reliable appearance`;
+    } else if (topicLower.includes('discount') || topicLower.includes('off') || topicLower.includes('special') || topicLower.includes('save')) {
+      sceneDescription = `smiling ${business.trade} in branded uniform holding tools, bright cheerful setting, clean modern home background, welcoming and friendly`;
+    } else if (topicLower.includes('safety') || topicLower.includes('tip') || topicLower.includes('guide')) {
+      sceneDescription = `${business.trade} explaining equipment to attentive homeowner, educational moment, clean organized workspace, professional consultation`;
+    } else if (topicLower.includes('winter') || topicLower.includes('freeze') || topicLower.includes('cold')) {
+      sceneDescription = `${business.trade} protecting home pipes with insulation, cozy winter scene, warm indoor lighting, prevention and care theme`;
+    } else if (topicLower.includes('summer') || topicLower.includes('heat') || topicLower.includes('cool')) {
+      sceneDescription = `${business.trade} servicing AC unit on sunny day, refreshing cool air theme, satisfied homeowner in background, summer comfort`;
+    } else if (topicLower.includes('new') || topicLower.includes('install') || topicLower.includes('upgrade')) {
+      sceneDescription = `${business.trade} proudly showing newly installed modern equipment, gleaming new installation, impressed homeowner, quality craftsmanship`;
+    } else {
+      sceneDescription = `professional ${business.trade} at work in beautiful modern home, excellent craftsmanship, satisfied customer interaction`;
     }
+
+    // Build final prompt with high-quality marketing style
+    const imagePrompt = `${sceneDescription}. Photography style: high-end marketing photo, soft natural lighting, shallow depth of field, warm color tones, 4K quality, editorial style`;
 
     console.log('Topic:', topic);
     console.log('Image prompt:', imagePrompt.substring(0, 150));
