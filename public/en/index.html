@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketingClaw - AI Marketing Copilot for Home Pros</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #FF6B35;
+            --primary-light: #FFF4F0;
+            --bg: #F5F5F7;
+            --card-bg: #FFFFFF;
+            --text: #1d1d1f;
+            --text-secondary: #86868b;
+            --border: #d2d2d7;
+            --success: #34c759;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo-icon { font-size: 32px; }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        .cta-button {
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover { transform: scale(1.05); }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 100px 40px 80px;
+            background: linear-gradient(180deg, #FFF 0%, var(--bg) 100%);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary), #FF8F6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 30px;
+            line-height: 1.5;
+        }
+
+        .hero-trades {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .trade-badge {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            border: 1px solid var(--border);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover { transform: scale(1.05); }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text);
+            padding: 16px 32px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            border: 2px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Platforms */
+        .platforms {
+            padding: 80px 40px;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 50px;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .platform-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .platform-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+
+        .platform-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .platform-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .platform-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Features */
+        .features {
+            padding: 80px 40px;
+            background: white;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            padding: 30px;
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 40px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), #FF8F6B);
+            color: white;
+        }
+
+        .cta-section h2 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .cta-section .btn-white {
+            background: white;
+            color: var(--primary);
+            padding: 16px 32px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            display: inline-block;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 36px; }
+            .platform-grid { grid-template-columns: repeat(2, 1fr); }
+            .feature-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <a href="index.html" class="logo">
+            <span class="logo-icon">🏠🔧</span>
+            <span>MarketingClaw</span>
+        </a>
+        <nav class="nav-links">
+            <a href="marketplace.html">Agent Hub</a>
+            <a href="chat.html">WorkSpace</a>
+            <a href="#features">Features</a>
+            <a href="pricing.html">Pricing</a>
+        </nav>
+        <a href="chat.html" class="cta-button">Get Started Free</a>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <span class="hero-badge">AI Marketing Copilot for Home Pros</span>
+        <h1>Get More Local Leads<br>Without the Marketing Hassle</h1>
+        <p>AI-powered content creation for Google Business, Nextdoor, Facebook & Thumbtack. Built specifically for home service professionals.</p>
+
+        <div class="hero-trades">
+            <span class="trade-badge">🔧 Plumbers</span>
+            <span class="trade-badge">⚡ Electricians</span>
+            <span class="trade-badge">❄️ HVAC</span>
+            <span class="trade-badge">🏠 Roofers</span>
+            <span class="trade-badge">🌿 Landscapers</span>
+            <span class="trade-badge">🏡 Real Estate</span>
+        </div>
+
+        <div class="hero-buttons">
+            <a href="chat.html" class="btn-primary">Start Creating Content</a>
+            <a href="marketplace.html" class="btn-secondary">Browse Agents</a>
+        </div>
+    </section>
+
+    <!-- Platforms -->
+    <section class="platforms">
+        <h2 class="section-title">Content for Every Platform</h2>
+        <p class="section-subtitle">Generate optimized content for the platforms your customers actually use</p>
+
+        <div class="platform-grid">
+            <div class="platform-card">
+                <div class="platform-icon">📍</div>
+                <div class="platform-name">Google Business</div>
+                <div class="platform-desc">Posts, updates & Q&A for local search</div>
+            </div>
+            <div class="platform-card">
+                <div class="platform-icon">🏘️</div>
+                <div class="platform-name">Nextdoor</div>
+                <div class="platform-desc">Neighbor-friendly community posts</div>
+            </div>
+            <div class="platform-card">
+                <div class="platform-icon">📘</div>
+                <div class="platform-name">Facebook</div>
+                <div class="platform-desc">Local group & page content</div>
+            </div>
+            <div class="platform-card">
+                <div class="platform-icon">📌</div>
+                <div class="platform-name">Thumbtack</div>
+                <div class="platform-desc">Profiles & quote responses</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features" id="features">
+        <h2 class="section-title" style="text-align:center;">Built for Home Service Pros</h2>
+        <p class="section-subtitle" style="text-align:center;">Features designed around how you actually work</p>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📍</div>
+                <div class="feature-title">Local Trend Radar</div>
+                <div class="feature-desc">Know what homeowners in your ZIP code are searching for. Get content ideas based on local trends, weather, and seasonal demands.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-title">Industry-Specific AI</div>
+                <div class="feature-desc">Agents trained on your trade. They understand plumbing, electrical, HVAC, roofing terminology and know how to explain it to homeowners.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🏘️</div>
+                <div class="feature-title">Community Tone</div>
+                <div class="feature-desc">Content that sounds like a trusted neighbor, not a salesperson. Perfect for Nextdoor and local Facebook groups.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📸</div>
+                <div class="feature-title">Project Showcases</div>
+                <div class="feature-desc">Turn your job site photos into professional before/after posts and project galleries that win trust.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⭐</div>
+                <div class="feature-title">Review Management</div>
+                <div class="feature-desc">Professional responses to Google and Yelp reviews. Handle praise and complaints with the right tone.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌤️</div>
+                <div class="feature-title">Weather Triggers</div>
+                <div class="feature-desc">Get content ideas when weather creates service opportunities. Storm prep, freeze warnings, heat waves.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <h2>Ready to Get More Local Leads?</h2>
+        <p>Join home service pros who are growing their business with AI-powered marketing</p>
+        <a href="chat.html" class="btn-white">Start Free Today</a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>MarketingClaw - AI Marketing Copilot for Home Pros</p>
+        <p style="margin-top:10px;">
+            Part of the <a href="https://github.com/anthropics/skills">Claude Skills</a> ecosystem
+        </p>
+    </footer>
+</body>
+</html>

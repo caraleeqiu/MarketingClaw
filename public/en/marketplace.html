@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Marketing Agents for Home Service Professionals - Plumbers, Electricians, HVAC, Roofers, Landscapers">
+    <title>Home Pro Agent Hub - MarketingClaw</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #FF6B35;
+            --primary-light: #FFF4F0;
+            --bg: #F5F5F7;
+            --card-bg: #FFFFFF;
+            --text: #1d1d1f;
+            --text-secondary: #86868b;
+            --border: #d2d2d7;
+            --success: #34c759;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: white;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .logo-icon { font-size: 28px; white-space: nowrap; }
+
+        .nav-menu {
+            padding: 15px 12px;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-item .icon { font-size: 20px; }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 15px 0;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), #FF8F6B);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .user-info .name { font-weight: 600; font-size: 14px; }
+        .user-info .plan { font-size: 12px; color: var(--text-secondary); }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 60px 40px;
+            background: linear-gradient(180deg, #FFF 0%, var(--bg) 100%);
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary), #FF8F6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .hero .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+
+        /* Categories */
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 20px 40px;
+            flex-wrap: wrap;
+        }
+
+        .category-tag {
+            padding: 10px 20px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .category-tag:hover, .category-tag.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Agent Grid */
+        .agent-grid {
+            padding: 30px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .category-section {
+            margin-bottom: 40px;
+        }
+
+        .category-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-header .count {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .agents-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 1100px) {
+            .agents-row { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 700px) {
+            .agents-row { grid-template-columns: 1fr; }
+        }
+
+        .agent-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+
+        .agent-card.added { border-color: var(--success); }
+
+        .agent-banner {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            position: relative;
+        }
+
+        .agent-banner .badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 4px 10px;
+            background: var(--success);
+            color: white;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .agent-info { padding: 20px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+
+        .agent-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .agent-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .agent-tag {
+            padding: 4px 10px;
+            background: var(--bg);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .agent-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .agent-author { font-size: 13px; color: var(--text-secondary); }
+
+        .add-btn {
+            padding: 8px 20px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .add-btn.added {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: white;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 30px 30px 0;
+            display: flex;
+            gap: 20px;
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            flex-shrink: 0;
+        }
+
+        .modal-title-area { flex: 1; }
+        .modal-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .modal-subtitle { color: var(--text-secondary); font-size: 15px; }
+        .modal-body { padding: 25px 30px; }
+        .modal-section { margin-bottom: 25px; }
+
+        .modal-section-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-section-content { line-height: 1.6; }
+        .example-list { list-style: none; }
+
+        .example-list li {
+            padding: 12px 15px;
+            background: var(--bg);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .modal-footer {
+            padding: 20px 30px 30px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.cancel { background: var(--bg); border: none; color: var(--text); }
+        .modal-btn.primary { background: var(--primary); border: none; color: white; }
+        .modal-btn.primary.added { background: var(--success); }
+        .modal-btn:hover { transform: scale(1.02); }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1d1d1f;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="index.html" class="logo" style="text-decoration:none; color:inherit;">
+            <span class="logo-icon">🏠🔧</span>
+            <span>MarketingClaw</span>
+        </a>
+
+        <nav class="nav-menu">
+            <a href="marketplace.html" class="nav-item active">
+                <span class="icon">🏪</span>
+                <span>Agent Hub</span>
+            </a>
+            <a href="chat.html" class="nav-item">
+                <span class="icon">💬</span>
+                <span>WorkSpace</span>
+                <span class="badge" id="addedCount">0</span>
+            </a>
+
+            <div class="nav-divider"></div>
+
+            <a href="chat.html#auto-publish" class="nav-item">
+                <span class="icon">🚀</span>
+                <span>Auto Publish</span>
+            </a>
+            <a href="pricing.html" class="nav-item">
+                <span class="icon">💰</span>
+                <span>Pricing</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar">P</div>
+                <div class="user-info">
+                    <div class="name">Home Pro</div>
+                    <div class="plan">Free Plan</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Home Pro Agent Hub</h1>
+        <p>AI Agents built for local home service professionals. Generate content for Google, Nextdoor, Facebook & Thumbtack.</p>
+        <p class="subtitle">🔧 Plumbers • ⚡ Electricians • ❄️ HVAC • 🏠 Real Estate • 🏗️ Contractors • 🌿 Landscapers</p>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories">
+        <span class="category-tag active" data-category="all">All</span>
+        <span class="category-tag" data-category="local">📍 Local Intel</span>
+        <span class="category-tag" data-category="copywriting">✍️ Home Pro Copy</span>
+        <span class="category-tag" data-category="visual">📸 Project Photos</span>
+        <span class="category-tag" data-category="platform">📱 Platforms</span>
+        <span class="category-tag" data-category="industry">🔧 Industry AI</span>
+    </section>
+
+    <!-- Agent Grid -->
+    <section class="agent-grid" id="agentGrid"></section>
+
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-icon" id="modalIcon">🔧</div>
+                <div class="modal-title-area">
+                    <div class="modal-title" id="modalTitle">Agent Name</div>
+                    <div class="modal-subtitle" id="modalSubtitle">Agent description</div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <div class="modal-section-title">About</div>
+                    <div class="modal-section-content" id="modalDesc">
+                        Full description here...
+                    </div>
+                </div>
+                <div class="modal-section">
+                    <div class="modal-section-title">Usage Examples</div>
+                    <ul class="example-list" id="modalExamples">
+                        <li>Example prompt</li>
+                    </ul>
+                </div>
+                <div class="modal-section">
+                    <div class="modal-section-title">Capabilities</div>
+                    <div class="agent-tags" id="modalTags">
+                        <span class="agent-tag">Tag</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn primary" id="modalAddBtn" onclick="toggleAgentFromModal()">
+                    ➕ Add
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">Added to WorkSpace!</div>
+
+    <script>
+        // Home Pro Agent Data - Organized by Workflow
+        const agents = [
+            // ========== Local Intel ==========
+            {
+                id: 'localtrend',
+                name: 'Local Trend Radar',
+                icon: '📍',
+                color: '#FF9F0A',
+                category: 'local',
+                shortDesc: 'Track local trends by ZIP code',
+                fullDesc: 'Monitor what homeowners in your service area are searching for. Tracks seasonal trends, local events, weather-related demands, and community discussions on Nextdoor and local Facebook groups.',
+                examples: [
+                    'What are homeowners in 90210 searching for?',
+                    'Show me seasonal plumbing trends in Denver area',
+                    'What home repair topics are trending in my ZIP?'
+                ],
+                tags: ['ZIP Code', 'Local Trends', 'Seasonal'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'competitor',
+                name: 'Local Competitor Intel',
+                icon: '🕵️',
+                color: '#5856D6',
+                category: 'local',
+                shortDesc: 'Monitor local competition',
+                fullDesc: 'Track what other home service pros in your area are posting. Analyze their Google reviews, Nextdoor engagement, and Thumbtack profiles to find opportunities.',
+                examples: [
+                    'What are top plumbers in Austin posting about?',
+                    'Analyze reviews of HVAC companies in my area',
+                    'Find gaps in local electrician marketing'
+                ],
+                tags: ['Competition', 'Reviews', 'Opportunities'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'weather',
+                name: 'Weather Opportunity Finder',
+                icon: '🌤️',
+                color: '#64D2FF',
+                category: 'local',
+                shortDesc: 'Turn weather into marketing',
+                fullDesc: 'Connects to Weather.gov API to identify weather-related service opportunities. Generates timely content for storms, extreme temperatures, and seasonal changes.',
+                examples: [
+                    'What weather-related content should I post this week?',
+                    'Create a storm preparation post for homeowners',
+                    'Generate freeze warning content for plumbers'
+                ],
+                tags: ['Weather', 'Timely', 'Seasonal'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'seolocal',
+                name: 'Local SEO Analyzer',
+                icon: '📊',
+                color: '#007AFF',
+                category: 'local',
+                shortDesc: 'Dominate "near me" searches',
+                fullDesc: 'Optimize for local search with AI-powered keyword research. Focus on "[service] near me" and "[service] in [city]" searches that drive leads.',
+                examples: [
+                    'What keywords should a Denver plumber target?',
+                    'Analyze my Google Business Profile for SEO',
+                    'Find untapped local search opportunities'
+                ],
+                tags: ['Local SEO', 'Google Maps', 'Near Me'],
+                author: 'MarketingClaw'
+            },
+
+            // ========== Home Pro Copywriting ==========
+            {
+                id: 'homeprocopy',
+                name: 'Home Pro Copywriter',
+                icon: '✍️',
+                color: '#AC8E68',
+                category: 'copywriting',
+                shortDesc: 'Professional home service copy',
+                fullDesc: 'Write compelling copy that builds trust with homeowners. Specializes in service descriptions, About pages, and trust-building content for contractors.',
+                examples: [
+                    'Write an About page for a family plumbing business',
+                    'Create service descriptions for my HVAC company',
+                    'Write a trust-building intro for my contracting website'
+                ],
+                tags: ['Trust', 'Professional', 'Local'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'reviewresponse',
+                name: 'Review Responder',
+                icon: '⭐',
+                color: '#FFD60A',
+                category: 'copywriting',
+                shortDesc: 'Professional review responses',
+                fullDesc: 'Generate thoughtful responses to customer reviews on Google, Yelp, and Thumbtack. Handle both positive reviews and negative feedback professionally.',
+                examples: [
+                    'Respond to this 5-star Google review',
+                    'Write a professional response to a complaint',
+                    'Thank a customer who mentioned specific work'
+                ],
+                tags: ['Reviews', 'Reputation', 'Professional'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'estimate',
+                name: 'Estimate & Quote Writer',
+                icon: '📋',
+                color: '#30D158',
+                category: 'copywriting',
+                shortDesc: 'Professional estimates that win jobs',
+                fullDesc: 'Generate clear, professional estimates and quotes that explain the work, build trust, and close more jobs. Includes warranty language and terms.',
+                examples: [
+                    'Write an estimate for a water heater replacement',
+                    'Create a quote template for electrical panel upgrade',
+                    'Generate professional scope of work language'
+                ],
+                tags: ['Estimates', 'Quotes', 'Close Jobs'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'seoblog',
+                name: 'SEO Blog Writer',
+                icon: '📝',
+                color: '#5856D6',
+                category: 'copywriting',
+                shortDesc: 'SEO-optimized blog content',
+                fullDesc: 'Write SEO-optimized blog posts that rank on Google and drive organic traffic. Covers local keywords, service pages, and educational content that establishes expertise.',
+                examples: [
+                    'Write a blog post about "signs you need a new water heater"',
+                    'Create an SEO service page for AC installation',
+                    'Generate a local-focused blog about home maintenance tips'
+                ],
+                tags: ['SEO', 'Blog', 'Content Marketing'],
+                author: 'MarketingClaw'
+            },
+
+            // ========== Project Photos ==========
+            {
+                id: 'beforeafter',
+                name: 'Before/After Generator',
+                icon: '📸',
+                color: '#AF52DE',
+                category: 'visual',
+                shortDesc: 'Showcase your work visually',
+                fullDesc: 'Create compelling before/after image posts from your project photos. Adds professional captions, annotations, and call-to-actions.',
+                examples: [
+                    'Create a before/after post for this bathroom remodel',
+                    'Generate a project showcase for Instagram',
+                    'Add professional captions to these project photos'
+                ],
+                tags: ['Photos', 'Before/After', 'Showcase'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'projectgallery',
+                name: 'Project Gallery Builder',
+                icon: '🖼️',
+                color: '#FF3B30',
+                category: 'visual',
+                shortDesc: 'Build portfolio from photos',
+                fullDesc: 'Turn your job site photos into a professional portfolio. Organizes projects by category, adds descriptions, and creates shareable galleries.',
+                examples: [
+                    'Create a portfolio page from these kitchen photos',
+                    'Build a gallery for my roofing projects',
+                    'Organize my work photos by service type'
+                ],
+                tags: ['Portfolio', 'Gallery', 'Professional'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'tipsvideo',
+                name: 'Home Tips Video Creator',
+                icon: '🎬',
+                color: '#FF2D55',
+                category: 'visual',
+                shortDesc: 'Educational content that builds trust',
+                fullDesc: 'Generate scripts and storyboards for helpful home maintenance tips videos. Position yourself as the local expert homeowners trust.',
+                examples: [
+                    'Create a video script: 5 signs you need a new water heater',
+                    'Generate a seasonal HVAC maintenance tips video',
+                    'Write a how-to video for homeowner drain care'
+                ],
+                tags: ['Video', 'Education', 'Trust'],
+                author: 'MarketingClaw'
+            },
+
+            // ========== Platform-Specific ==========
+            {
+                id: 'googlebiz',
+                name: 'Google Business Profile',
+                icon: '📍',
+                color: '#4285F4',
+                category: 'platform',
+                shortDesc: 'Posts and updates for Google',
+                fullDesc: 'Create Google Business Profile posts optimized for local search. Includes offers, updates, events, and Q&A responses. Helps you show up in Google Maps.',
+                examples: [
+                    'Create a Google Business post about our spring special',
+                    'Write a service update for Google',
+                    'Generate weekly posts for my plumbing business'
+                ],
+                tags: ['Google', 'Local Search', 'Maps'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'nextdoor',
+                name: 'Nextdoor Pro',
+                icon: '🏘️',
+                color: '#8DC63F',
+                category: 'platform',
+                shortDesc: 'Community-focused neighborhood posts',
+                fullDesc: 'Master the friendly, neighbor-to-neighbor tone that works on Nextdoor. Generate helpful posts, respond to recommendations, and build local reputation.',
+                examples: [
+                    'Write a helpful Nextdoor post about winter pipe prep',
+                    'Respond to a neighbor asking for contractor recs',
+                    'Create a community-focused introduction post'
+                ],
+                tags: ['Nextdoor', 'Community', 'Neighbors'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'facebooklocal',
+                name: 'Facebook Local',
+                icon: '📘',
+                color: '#1877F2',
+                category: 'platform',
+                shortDesc: 'Posts for local Facebook groups',
+                fullDesc: 'Create engaging Facebook posts for local community groups. Share tips, showcase work, and respond to homeowner questions in a helpful way.',
+                examples: [
+                    'Write a Facebook post about our team',
+                    'Create a helpful tip post for local homeowners',
+                    'Generate a project showcase for Facebook'
+                ],
+                tags: ['Facebook', 'Community', 'Local'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'thumbtack',
+                name: 'Thumbtack Pro',
+                icon: '📌',
+                color: '#009FD9',
+                category: 'platform',
+                shortDesc: 'Optimize your Thumbtack profile',
+                fullDesc: 'Create compelling Thumbtack profile content, quote responses, and follow-up messages that win more jobs. Stand out from other pros.',
+                examples: [
+                    'Write a Thumbtack profile bio for an electrician',
+                    'Create a quote response template that wins jobs',
+                    'Generate follow-up messages for Thumbtack leads'
+                ],
+                tags: ['Thumbtack', 'Leads', 'Quotes'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'instagram',
+                name: 'Instagram Pro',
+                icon: '📸',
+                color: '#E1306C',
+                category: 'platform',
+                shortDesc: 'Visual content for Instagram',
+                fullDesc: 'Create scroll-stopping Instagram content for home service businesses. Optimize for Reels, Stories, and feed posts with hashtag strategies that reach local homeowners.',
+                examples: [
+                    'Create an Instagram caption for this before/after photo',
+                    'Generate hashtags for a plumbing business in Austin',
+                    'Write a Reel script for a quick home tip'
+                ],
+                tags: ['Instagram', 'Visual', 'Reels'],
+                author: 'MarketingClaw'
+            },
+
+            // ========== Industry AI ==========
+            {
+                id: 'plumber',
+                name: 'Plumber AI',
+                icon: '🔧',
+                color: '#007AFF',
+                category: 'industry',
+                shortDesc: 'Marketing for plumbing pros',
+                fullDesc: 'Specialized marketing assistant for plumbers. Understands plumbing terminology, seasonal demands, common services, and how to explain complex work to homeowners.',
+                examples: [
+                    'Write content about water heater replacement',
+                    'Create a post about drain cleaning services',
+                    'Explain slab leak repair to homeowners'
+                ],
+                tags: ['Plumbing', 'Water Heaters', 'Drains'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'electrician',
+                name: 'Electrician AI',
+                icon: '⚡',
+                color: '#FFD60A',
+                category: 'industry',
+                shortDesc: 'Marketing for electrical pros',
+                fullDesc: 'Specialized marketing assistant for electricians. Covers panel upgrades, EV charger installation, lighting, safety inspections, and code compliance messaging.',
+                examples: [
+                    'Write content about electrical panel upgrades',
+                    'Create a post about EV charger installation',
+                    'Explain the importance of electrical safety'
+                ],
+                tags: ['Electrical', 'Panels', 'EV Chargers'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'hvac',
+                name: 'HVAC AI',
+                icon: '❄️',
+                color: '#5AC8FA',
+                category: 'industry',
+                shortDesc: 'Marketing for HVAC pros',
+                fullDesc: 'Specialized marketing assistant for HVAC technicians. Covers seasonal tune-ups, equipment replacement, indoor air quality, and energy efficiency messaging.',
+                examples: [
+                    'Write a pre-summer AC tune-up promotion',
+                    'Create content about heat pump benefits',
+                    'Generate posts about indoor air quality'
+                ],
+                tags: ['HVAC', 'AC', 'Heating'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'roofer',
+                name: 'Roofer AI',
+                icon: '🏠',
+                color: '#8B4513',
+                category: 'industry',
+                shortDesc: 'Marketing for roofing pros',
+                fullDesc: 'Specialized marketing assistant for roofing contractors. Covers storm damage, inspections, replacements, and insurance claim assistance messaging.',
+                examples: [
+                    'Write content about storm damage inspections',
+                    'Create a post about roof replacement process',
+                    'Explain insurance claim assistance to homeowners'
+                ],
+                tags: ['Roofing', 'Storm Damage', 'Inspections'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'landscaper',
+                name: 'Landscaper AI',
+                icon: '🌿',
+                color: '#34C759',
+                category: 'industry',
+                shortDesc: 'Marketing for landscaping pros',
+                fullDesc: 'Specialized marketing assistant for landscapers. Covers lawn care, hardscaping, seasonal services, and outdoor living space design.',
+                examples: [
+                    'Write content about spring lawn preparation',
+                    'Create a post about patio design services',
+                    'Generate seasonal service reminder content'
+                ],
+                tags: ['Landscaping', 'Lawn Care', 'Hardscape'],
+                author: 'MarketingClaw'
+            },
+            {
+                id: 'realestate',
+                name: 'Real Estate AI',
+                icon: '🏡',
+                color: '#FF6B35',
+                category: 'industry',
+                shortDesc: 'Marketing for real estate agents',
+                fullDesc: 'Specialized marketing assistant for real estate agents. Covers listings, market updates, buyer/seller tips, and community-focused content.',
+                examples: [
+                    'Write a new listing announcement post',
+                    'Create a neighborhood market update',
+                    'Generate first-time homebuyer tips content'
+                ],
+                tags: ['Real Estate', 'Listings', 'Market'],
+                author: 'MarketingClaw'
+            }
+        ];
+
+        let addedAgents = JSON.parse(localStorage.getItem('addedAgentsHomePro') || '[]');
+        let currentAgent = null;
+
+        function init() {
+            renderAgents('all');
+            updateAddedCount();
+
+            document.querySelectorAll('.category-tag').forEach(tag => {
+                tag.addEventListener('click', () => {
+                    document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+                    tag.classList.add('active');
+                    renderAgents(tag.dataset.category);
+                });
+            });
+        }
+
+        const categoryNames = {
+            local: { icon: '📍', name: 'Local Intelligence' },
+            copywriting: { icon: '✍️', name: 'Home Pro Copywriting' },
+            visual: { icon: '📸', name: 'Project Visuals' },
+            platform: { icon: '📱', name: 'Platform Specific' },
+            industry: { icon: '🔧', name: 'Industry Specialists' }
+        };
+
+        // Static images for agents - content-relevant Pexels photos
+        function getAgentImageUrl(agent) {
+            const images = {
+                // Local Intel
+                'localtrend': 'https://images.pexels.com/photos/7688460/pexels-photo-7688460.jpeg?auto=compress&w=400&h=200&fit=crop',      // Analytics dashboard with map
+                'competitor': 'https://images.pexels.com/photos/6801648/pexels-photo-6801648.jpeg?auto=compress&w=400&h=200&fit=crop',      // Business analysis charts
+                'weather': 'https://images.pexels.com/photos/1162251/pexels-photo-1162251.jpeg?auto=compress&w=400&h=200&fit=crop',         // Storm clouds weather
+                'seolocal': 'https://images.pexels.com/photos/270637/pexels-photo-270637.jpeg?auto=compress&w=400&h=200&fit=crop',          // SEO search code screen
+                // Copywriting
+                'homeprocopy': 'https://images.pexels.com/photos/4348401/pexels-photo-4348401.jpeg?auto=compress&w=400&h=200&fit=crop',     // Person typing content
+                'reviewresponse': 'https://images.pexels.com/photos/5632399/pexels-photo-5632399.jpeg?auto=compress&w=400&h=200&fit=crop',  // 5-star review rating
+                'estimate': 'https://images.pexels.com/photos/6863183/pexels-photo-6863183.jpeg?auto=compress&w=400&h=200&fit=crop',        // Invoice/quote document
+                'seoblog': 'https://images.pexels.com/photos/262508/pexels-photo-262508.jpeg?auto=compress&w=400&h=200&fit=crop',           // Blog writing laptop
+                // Visual
+                'beforeafter': 'https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&w=400&h=200&fit=crop',     // Home renovation
+                'projectgallery': 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&w=400&h=200&fit=crop',  // Interior design gallery
+                'tipsvideo': 'https://images.pexels.com/photos/4009402/pexels-photo-4009402.jpeg?auto=compress&w=400&h=200&fit=crop',       // Video recording setup
+                // Platform
+                'googlebiz': 'https://images.pexels.com/photos/218717/pexels-photo-218717.jpeg?auto=compress&w=400&h=200&fit=crop',         // Google search on phone
+                'nextdoor': 'https://images.pexels.com/photos/1546168/pexels-photo-1546168.jpeg?auto=compress&w=400&h=200&fit=crop',        // Neighborhood houses
+                'facebooklocal': 'https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&w=400&h=200&fit=crop',     // Social media likes
+                'thumbtack': 'https://images.pexels.com/photos/3760067/pexels-photo-3760067.jpeg?auto=compress&w=400&h=200&fit=crop',       // Lead/customer handshake
+                'instagram': 'https://images.pexels.com/photos/1092671/pexels-photo-1092671.jpeg?auto=compress&w=400&h=200&fit=crop',       // Phone with photos
+                // Industry - actual tradespeople at work
+                'plumber': 'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=400&h=200&fit=crop',         // Plumber fixing sink
+                'electrician': 'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=400&h=200&fit=crop',     // Electrician at panel
+                'hvac': 'https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&w=400&h=200&fit=crop',            // HVAC technician
+                'roofer': 'https://images.pexels.com/photos/8961001/pexels-photo-8961001.jpeg?auto=compress&w=400&h=200&fit=crop',          // Roofer on roof
+                'landscaper': 'https://images.pexels.com/photos/1453499/pexels-photo-1453499.jpeg?auto=compress&w=400&h=200&fit=crop',      // Beautiful landscaping
+                'realestate': 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&w=400&h=200&fit=crop'       // Modern house for sale
+            };
+            return images[agent.id] || 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&w=400&h=200&fit=crop';
+        }
+
+        function renderAgentCard(agent) {
+            const isAdded = addedAgents.includes(agent.id);
+            const imageUrl = getAgentImageUrl(agent);
+            return `
+                <div class="agent-card ${isAdded ? 'added' : ''}" onclick="showModal('${agent.id}')">
+                    <div class="agent-banner" style="background: linear-gradient(135deg, ${agent.color}22, ${agent.color}44); position: relative; overflow: hidden;">
+                        <img src="${imageUrl}" alt="${agent.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <span class="fallback-icon" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center; font-size: 48px;">${agent.icon}</span>
+                        ${isAdded ? '<span class="badge">Added</span>' : ''}
+                    </div>
+                    <div class="agent-info">
+                        <div class="agent-name">${agent.name}</div>
+                        <div class="agent-desc">${agent.shortDesc}</div>
+                        <div class="agent-tags">
+                            ${agent.tags.map(t => `<span class="agent-tag">${t}</span>`).join('')}
+                        </div>
+                        <div class="agent-footer">
+                            <span class="agent-author">by ${agent.author}</span>
+                            <button class="add-btn ${isAdded ? 'added' : ''}" onclick="event.stopPropagation(); toggleAgent('${agent.id}')">
+                                ${isAdded ? '✓ Added' : '➕ Add'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAgents(category) {
+            const grid = document.getElementById('agentGrid');
+
+            if (category === 'all') {
+                // Show all agents grouped by category
+                const categories = ['local', 'copywriting', 'visual', 'platform', 'industry'];
+                grid.innerHTML = categories.map(cat => {
+                    const catAgents = agents.filter(a => a.category === cat);
+                    const catInfo = categoryNames[cat];
+                    return `
+                        <div class="category-section">
+                            <div class="category-header">
+                                ${catInfo.icon} ${catInfo.name}
+                                <span class="count">(${catAgents.length} agents)</span>
+                            </div>
+                            <div class="agents-row">
+                                ${catAgents.map(a => renderAgentCard(a)).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                // Show single category
+                const filtered = agents.filter(a => a.category === category);
+                const catInfo = categoryNames[category];
+                grid.innerHTML = `
+                    <div class="category-section">
+                        <div class="category-header">
+                            ${catInfo.icon} ${catInfo.name}
+                            <span class="count">(${filtered.length} agents)</span>
+                        </div>
+                        <div class="agents-row">
+                            ${filtered.map(a => renderAgentCard(a)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function showModal(agentId) {
+            currentAgent = agents.find(a => a.id === agentId);
+            if (!currentAgent) return;
+
+            const isAdded = addedAgents.includes(agentId);
+
+            document.getElementById('modalIcon').textContent = currentAgent.icon;
+            document.getElementById('modalIcon').style.background = `linear-gradient(135deg, ${currentAgent.color}22, ${currentAgent.color}44)`;
+            document.getElementById('modalTitle').textContent = currentAgent.name;
+            document.getElementById('modalSubtitle').textContent = currentAgent.shortDesc;
+            document.getElementById('modalDesc').textContent = currentAgent.fullDesc;
+            document.getElementById('modalExamples').innerHTML = currentAgent.examples.map(e => `<li>${e}</li>`).join('');
+            document.getElementById('modalTags').innerHTML = currentAgent.tags.map(t => `<span class="agent-tag">${t}</span>`).join('');
+
+            const btn = document.getElementById('modalAddBtn');
+            btn.textContent = isAdded ? '✓ Added' : '➕ Add';
+            btn.className = `modal-btn primary ${isAdded ? 'added' : ''}`;
+
+            document.getElementById('modalOverlay').classList.add('show');
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('modalOverlay').classList.remove('show');
+            currentAgent = null;
+        }
+
+        function toggleAgent(agentId) {
+            const index = addedAgents.indexOf(agentId);
+            if (index === -1) {
+                addedAgents.push(agentId);
+                showToast('Added to WorkSpace!');
+            } else {
+                addedAgents.splice(index, 1);
+                showToast('Removed from WorkSpace');
+            }
+            localStorage.setItem('addedAgentsHomePro', JSON.stringify(addedAgents));
+            renderAgents(document.querySelector('.category-tag.active').dataset.category);
+            updateAddedCount();
+        }
+
+        function toggleAgentFromModal() {
+            if (currentAgent) {
+                toggleAgent(currentAgent.id);
+                closeModal();
+            }
+        }
+
+        function updateAddedCount() {
+            document.getElementById('addedCount').textContent = addedAgents.length;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        init();
+    </script>
+</body>
+</html>

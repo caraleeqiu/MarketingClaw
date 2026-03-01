@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - MarketingClaw</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #FF6B35;
+            --primary-dark: #E55A2B;
+            --bg: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text: #1a1a1a;
+            --text-secondary: #666;
+            --border: #E8E8E8;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #FF6B35 0%, #FF8F6B 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 48px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon { font-size: 48px; margin-bottom: 12px; }
+        .logo-text { font-size: 28px; font-weight: 700; color: var(--primary); }
+        .logo-subtitle { color: var(--text-secondary); font-size: 14px; margin-top: 8px; }
+
+        .auth-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .auth-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid var(--border);
+            background: white;
+            color: var(--text);
+        }
+
+        .auth-btn:hover { border-color: var(--primary); background: var(--bg); }
+
+        .auth-btn.google { background: #4285F4; border-color: #4285F4; color: white; }
+        .auth-btn.google:hover { background: #3574E0; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .divider span { padding: 0 16px; }
+
+        .email-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label { font-size: 14px; font-weight: 500; color: var(--text); }
+
+        .input-group input {
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus { outline: none; border-color: var(--primary); }
+
+        .submit-btn {
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .submit-btn:hover { background: var(--primary-dark); }
+        .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        .message {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        .message.success { background: #E8F5E9; color: #2E7D32; }
+        .message.error { background: #FFEBEE; color: #C62828; }
+
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .footer a { color: var(--primary); text-decoration: none; }
+
+        /* Demo Login */
+        .demo-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .demo-title {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .demo-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .demo-credentials {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <div class="logo-icon">🏠🔧</div>
+            <div class="logo-text">MarketingClaw</div>
+            <div class="logo-subtitle">AI Marketing for Home Pros</div>
+        </div>
+
+        <div class="auth-buttons">
+            <button class="auth-btn google" onclick="signInWithGoogle()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                Continue with Google
+            </button>
+        </div>
+
+        <div class="divider"><span>or use email</span></div>
+
+        <form class="email-form" onsubmit="signInWithEmail(event)">
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="your@email.com" required>
+            </div>
+            <button type="submit" class="submit-btn" id="submitBtn">
+                Send Magic Link
+            </button>
+        </form>
+
+        <div id="message" class="message" style="display: none;"></div>
+
+        <!-- Demo Login for Judges -->
+        <div class="demo-section">
+            <div class="demo-title">🎯 For Demo / Judges</div>
+            <button class="demo-btn" onclick="demoLogin()">
+                ⚡ Quick Demo Access
+            </button>
+            <div class="demo-credentials">
+                No signup required • Instant access
+            </div>
+        </div>
+
+        <div class="footer">
+            By signing in, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://sygylcdxubqgswnzapku.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5Z3lsY2R4dWJxZ3N3bnphcGt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzE1MzUsImV4cCI6MjA4Njk0NzUzNX0.L8AD16JIRsFKahBYdneCPU4nvnKtw02_AiL3NPulvvg';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Demo user credentials (stored in localStorage for demo purposes)
+        const DEMO_USER = {
+            email: 'demo@marketingclaw.com',
+            name: 'Demo User',
+            avatar: 'D',
+            plan: 'Pro Trial',
+            isDemo: true
+        };
+
+        async function checkAuth() {
+            // Check for demo user
+            const demoUser = localStorage.getItem('marketingclaw_demo_user');
+            if (demoUser) {
+                window.location.href = 'chat.html';
+                return;
+            }
+
+            // Check for Supabase session
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                window.location.href = 'chat.html';
+            }
+        }
+        checkAuth();
+
+        async function signInWithGoogle() {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: window.location.origin + '/en/chat.html' }
+            });
+            if (error) showMessage(error.message, 'error');
+        }
+
+        async function signInWithEmail(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const btn = document.getElementById('submitBtn');
+
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+
+            const { error } = await supabase.auth.signInWithOtp({
+                email: email,
+                options: { emailRedirectTo: window.location.origin + '/en/chat.html' }
+            });
+
+            btn.disabled = false;
+            btn.textContent = 'Send Magic Link';
+
+            if (error) {
+                showMessage(error.message, 'error');
+            } else {
+                showMessage('Check your email for the login link!', 'success');
+            }
+        }
+
+        function demoLogin() {
+            // Store demo user in localStorage
+            localStorage.setItem('marketingclaw_demo_user', JSON.stringify(DEMO_USER));
+            localStorage.setItem('marketingclaw_user', JSON.stringify(DEMO_USER));
+
+            // Redirect to workbench
+            window.location.href = 'chat.html';
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+            msg.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

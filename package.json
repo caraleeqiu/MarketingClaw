@@ -1,0 +1,12 @@
+{
+  "name": "marketingclaw",
+  "version": "1.0.0",
+  "description": "AI Marketing Copilot for Home Service Professionals",
+  "scripts": {
+    "dev": "npx serve public -p 3000",
+    "start": "npx serve public -p 3000"
+  },
+  "keywords": ["marketing", "ai", "home-services", "local-business"],
+  "author": "MarketingClaw",
+  "license": "MIT"
+}

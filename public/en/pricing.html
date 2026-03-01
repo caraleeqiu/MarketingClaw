@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - MarketingClaw</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/shared.css">
+    <style>
+        body { display: block; }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo { border: none; padding: 0; }
+
+        .nav { display: flex; gap: 32px; }
+
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .nav a:hover, .nav a.active { color: var(--primary); }
+
+        .hero {
+            text-align: center;
+            padding: 80px 40px 60px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+            white-space: nowrap;
+        }
+
+        .toggle-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 40px 0;
+        }
+
+        .toggle {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .toggle-btn {
+            padding: 12px 24px;
+            border: none;
+            background: none;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active { background: var(--primary); color: white; }
+
+        .toggle-btn .save {
+            font-size: 12px;
+            background: var(--success);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 40px 80px;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 32px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .pricing-card.popular { border-color: var(--primary); }
+
+        .pricing-card.popular::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .plan-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .plan-name { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .plan-desc { color: var(--text-secondary); font-size: 15px; margin-bottom: 24px; }
+        .plan-price { margin-bottom: 24px; }
+        .price-amount { font-size: 48px; font-weight: 800; }
+        .price-period { color: var(--text-secondary); font-size: 15px; }
+
+        .credits-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .plan-cta {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 24px;
+        }
+
+        .plan-cta.primary { background: var(--primary); color: white; }
+        .plan-cta.primary:hover { background: #E55A28; transform: scale(1.02); }
+        .plan-cta.outline { background: white; border: 2px solid var(--border); color: var(--text); }
+        .plan-cta.outline:hover { border-color: var(--primary); color: var(--primary); }
+
+        .features-list { list-style: none; }
+
+        .features-list li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .features-list li::before {
+            content: '✓';
+            width: 20px;
+            height: 20px;
+            background: #E8FFF3;
+            color: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .credit-section {
+            background: white;
+            padding: 80px 40px;
+        }
+
+        .credit-section h2 {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .credit-section > p {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+        }
+
+        .credit-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .credit-item {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .credit-item .icon { font-size: 36px; margin-bottom: 12px; }
+        .credit-item .name { font-weight: 600; margin-bottom: 8px; }
+        .credit-item .cost { color: var(--primary); font-weight: 700; font-size: 18px; }
+
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .footer a { color: var(--primary); text-decoration: none; }
+
+        @media (max-width: 900px) {
+            .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+            .credit-grid { grid-template-columns: repeat(2, 1fr); }
+            .hero h1 { font-size: 32px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="logo">
+            <span class="logo-icon">🏠🔧</span>
+            <span>MarketingClaw</span>
+        </a>
+        <nav class="nav">
+            <a href="marketplace.html">Agent Hub</a>
+            <a href="chat.html">WorkSpace</a>
+            <a href="pricing.html" class="active">Pricing</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Simple, transparent pricing</h1>
+        <p>Pay only for what you use. All plans include full access to every AI agent.</p>
+    </section>
+
+    <div class="toggle-wrapper">
+        <div class="toggle">
+            <button class="toggle-btn active" onclick="togglePricing('monthly')">Monthly</button>
+            <button class="toggle-btn" onclick="togglePricing('yearly')">Yearly <span class="save">Save 20%</span></button>
+        </div>
+    </div>
+
+    <section class="pricing-grid">
+        <div class="pricing-card">
+            <div class="plan-icon" style="background: #F3F4F6;">🆓</div>
+            <div class="plan-name">Free</div>
+            <div class="plan-desc">Perfect for trying it out</div>
+            <div class="plan-price">
+                <span class="price-amount">$0</span>
+                <span class="price-period">/ month</span>
+            </div>
+            <div class="credits-badge">⚡ 50 credits / month</div>
+            <button class="plan-cta outline">Get Started</button>
+            <ul class="features-list">
+                <li>All AI Agents</li>
+                <li>50 credits monthly</li>
+                <li>Basic image generation</li>
+                <li>Community support</li>
+            </ul>
+        </div>
+
+        <div class="pricing-card popular">
+            <div class="plan-icon" style="background: linear-gradient(135deg, #FF6B35 0%, #FF8F6B 100%);">🚀</div>
+            <div class="plan-name">Pro</div>
+            <div class="plan-desc">For active home pros</div>
+            <div class="plan-price">
+                <span class="price-amount" id="proPrice">$49</span>
+                <span class="price-period">/ month</span>
+            </div>
+            <div class="credits-badge">⚡ 2,000 credits / month</div>
+            <button class="plan-cta primary">Upgrade to Pro</button>
+            <ul class="features-list">
+                <li>Everything in Free</li>
+                <li>1,000 credits monthly</li>
+                <li>HD image generation</li>
+                <li>Video creation</li>
+                <li>Priority support</li>
+                <li>API access</li>
+            </ul>
+        </div>
+
+        <div class="pricing-card">
+            <div class="plan-icon" style="background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);">👥</div>
+            <div class="plan-name">Team</div>
+            <div class="plan-desc">For growing businesses</div>
+            <div class="plan-price">
+                <span class="price-amount" id="teamPrice">$149</span>
+                <span class="price-period">/ month</span>
+            </div>
+            <div class="credits-badge">⚡ 10,000 credits / month</div>
+            <button class="plan-cta outline">Contact Sales</button>
+            <ul class="features-list">
+                <li>Everything in Pro</li>
+                <li>5,000 credits monthly</li>
+                <li>5 team members</li>
+                <li>Custom templates</li>
+                <li>Dedicated support</li>
+                <li>Data export</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="credit-section">
+        <h2>Credit Usage Guide</h2>
+        <p>Different features use different amounts of credits</p>
+
+        <div class="credit-grid">
+            <div class="credit-item">
+                <div class="icon">📍</div>
+                <div class="name">Google Post</div>
+                <div class="cost">2 credits</div>
+            </div>
+            <div class="credit-item">
+                <div class="icon">🏘️</div>
+                <div class="name">Nextdoor Post</div>
+                <div class="cost">2 credits</div>
+            </div>
+            <div class="credit-item">
+                <div class="icon">📸</div>
+                <div class="name">Project Photo</div>
+                <div class="cost">5 credits</div>
+            </div>
+            <div class="credit-item">
+                <div class="icon">⭐</div>
+                <div class="name">Review Response</div>
+                <div class="cost">1 credit</div>
+            </div>
+            <div class="credit-item">
+                <div class="icon">📋</div>
+                <div class="name">Estimate/Quote</div>
+                <div class="cost">3 credits</div>
+            </div>
+            <div class="credit-item">
+                <div class="icon">🎬</div>
+                <div class="name">Tips Video</div>
+                <div class="cost">20 credits</div>
+            </div>
+            <div class="credit-item">
+                <div class="icon">🔥</div>
+                <div class="name">Local Trends</div>
+                <div class="cost">2 credits</div>
+            </div>
+            <div class="credit-item">
+                <div class="icon">📌</div>
+                <div class="name">Thumbtack Profile</div>
+                <div class="cost">5 credits</div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>🏠🔧 MarketingClaw - AI Marketing for Home Pros</p>
+        <p style="margin-top: 10px; opacity: 0.6;">
+            <a href="marketplace.html">Agent Hub</a> ·
+            <a href="chat.html">WorkSpace</a>
+        </p>
+    </footer>
+
+    <script>
+        function togglePricing(type) {
+            const btns = document.querySelectorAll('.toggle-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const proPrice = document.getElementById('proPrice');
+            const teamPrice = document.getElementById('teamPrice');
+
+            if (type === 'yearly') {
+                proPrice.textContent = '$39';
+                teamPrice.textContent = '$119';
+            } else {
+                proPrice.textContent = '$49';
+                teamPrice.textContent = '$149';
+            }
+        }
+    </script>
+</body>
+</html>
