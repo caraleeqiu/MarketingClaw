@@ -175,7 +175,7 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
             parameters: {
               sampleCount: 1,
               aspectRatio: '1:1',
-              personGeneration: 'dont_allow'
+              personGeneration: 'allow_adult'
             }
           }),
         }
