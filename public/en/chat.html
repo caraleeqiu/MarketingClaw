@@ -3319,6 +3319,43 @@ For example: "Austin, TX 78704"`);
             const iconEl = document.getElementById(`agent-${num}-icon`);
             if (statusEl) statusEl.textContent = status;
             if (iconEl) iconEl.textContent = icon;
+
+            // Sync with sidebar
+            updateSidebarAgentStatus(num, icon);
+        }
+
+        function updateSidebarAgentStatus(num, icon) {
+            const agentNames = {
+                1: 'Local Trend Radar',
+                2: 'Weather Opportunity Finder',
+                3: (window.businessInfo?.trade ? capitalize(window.businessInfo.trade) : 'Plumber') + ' Industry Expert',
+                4: 'Platform Strategy Advisor'
+            };
+            const name = agentNames[num];
+            if (!name) return;
+
+            // Find and update the sidebar item
+            const list = document.getElementById('hiredAgentsList');
+            if (!list) return;
+
+            const items = list.querySelectorAll('div');
+            items.forEach(item => {
+                if (item.textContent.includes(name.split(' ')[0])) {
+                    const statusSpan = item.querySelector('span:last-child');
+                    if (statusSpan) {
+                        if (icon === '✅') {
+                            statusSpan.textContent = '✅ Done';
+                            statusSpan.style.color = 'var(--success)';
+                        } else if (icon === '🔄') {
+                            statusSpan.textContent = '🔄 Working';
+                            statusSpan.style.color = 'var(--primary)';
+                        } else {
+                            statusSpan.textContent = '⏳ Waiting';
+                            statusSpan.style.color = 'var(--text-secondary)';
+                        }
+                    }
+                }
+            });
         }
 
         async function showTopicRecommendationsChat() {
@@ -4373,7 +4410,8 @@ Your satisfaction matters to us.
             for (let i = 0; i < cycle; i++) {
                 const postDate = new Date(nextDate);
                 postDate.setDate(postDate.getDate() + (i * 7));
-                const topic = autoPostTopics[i % autoPostTopics.length];
+                // Use custom topic if set, otherwise use default
+                const topic = customPostTopics[i] || autoPostTopics[i % autoPostTopics.length];
                 posts.push({
                     week: i + 1,
                     date: postDate,
@@ -4382,9 +4420,47 @@ Your satisfaction matters to us.
                 });
             }
 
+            // Trade-specific images for Auto Publish
+            const tradePostImages = {
+                plumber: [
+                    'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/6419126/pexels-photo-6419126.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/6419135/pexels-photo-6419135.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/6419121/pexels-photo-6419121.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/6419119/pexels-photo-6419119.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=200'
+                ],
+                electrician: [
+                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200'
+                ],
+                hvac: [
+                    'https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/5463576/pexels-photo-5463576.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/4489765/pexels-photo-4489765.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/5463576/pexels-photo-5463576.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/4489765/pexels-photo-4489765.jpeg?auto=compress&w=200'
+                ],
+                roofer: [
+                    'https://images.pexels.com/photos/8961001/pexels-photo-8961001.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/8961004/pexels-photo-8961004.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/7937944/pexels-photo-7937944.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/8961001/pexels-photo-8961001.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/8961004/pexels-photo-8961004.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/7937944/pexels-photo-7937944.jpeg?auto=compress&w=200'
+                ]
+            };
+            const postImages = tradePostImages[biz.trade] || tradePostImages.plumber;
+
             const postsHTML = posts.map((post, idx) => {
                 const dateStr = post.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const isFirst = idx === 0;
+                const postImage = postImages[idx % postImages.length];
 
                 return `
                     <div style="background: white; border-radius: 12px; overflow: hidden; border: 2px solid ${isFirst ? 'var(--primary)' : 'var(--border)'}; ${isFirst ? 'box-shadow: 0 4px 12px rgba(255,107,53,0.2);' : ''}">
@@ -4394,7 +4470,7 @@ Your satisfaction matters to us.
                         </div>
                         <div style="padding: 16px;">
                             <div style="display: flex; gap: 12px;">
-                                <img src="https://images.pexels.com/photos/${6419128 + idx}/pexels-photo-${6419128 + idx}.jpeg?auto=compress&w=200"
+                                <img src="${postImage}"
                                      onerror="this.src='https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=200'"
                                      style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
                                 <div style="flex: 1; min-width: 0;">
@@ -4431,7 +4507,7 @@ Your satisfaction matters to us.
         }
 
         function editScheduledPost(idx) {
-            const topic = autoPostTopics[idx % autoPostTopics.length];
+            const topic = customPostTopics[idx] || autoPostTopics[idx % autoPostTopics.length];
             const biz = window.businessInfo || { name: 'Your Business', trade: 'plumber', location: 'Austin, TX', phone: '(555) 123-4567' };
             const content = `${topic.icon} ${topic.title}\n\n${topic.content}\n\nPerfect for ${biz.location.split(',')[0]} homeowners!\n\nCall us: ${biz.phone}`;
 
@@ -4464,20 +4540,33 @@ Your satisfaction matters to us.
         function saveScheduledEdit(idx) {
             const title = document.getElementById('editPostTitle').value;
             const content = document.getElementById('editPostContent').value;
-            autoPostTopics[idx % autoPostTopics.length] = {
-                ...autoPostTopics[idx % autoPostTopics.length],
+            const baseTopic = customPostTopics[idx] || autoPostTopics[idx % autoPostTopics.length];
+            customPostTopics[idx] = {
+                ...baseTopic,
                 title: title,
                 content: content.split('\n')[2] || content
             };
             closeScheduledEditModal();
-            showToast('✅ Post updated!');
+            showToast('✅ Week ' + (idx + 1) + ' updated!');
             generatePostsList();
         }
 
+        // Track custom topics for each post
+        let customPostTopics = {};
+
         function regeneratePost(idx) {
-            const random = autoPostTopics[Math.floor(Math.random() * autoPostTopics.length)];
-            showToast('🔄 New topic: ' + random.title);
-            generatePostsList(); // Refresh
+            // Get a different random topic
+            const currentTopic = customPostTopics[idx] || autoPostTopics[idx % autoPostTopics.length];
+            let newTopic;
+            do {
+                newTopic = autoPostTopics[Math.floor(Math.random() * autoPostTopics.length)];
+            } while (newTopic.title === currentTopic.title && autoPostTopics.length > 1);
+
+            // Save the new topic for this specific post
+            customPostTopics[idx] = newTopic;
+
+            showToast('🔄 Week ' + (idx + 1) + ' changed to: ' + newTopic.title);
+            generatePostsList(); // Refresh with new topic
         }
 
         function approvePost(idx) {
