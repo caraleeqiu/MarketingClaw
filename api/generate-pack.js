@@ -1,5 +1,6 @@
 // Vercel Serverless Function - Generate Marketing Content Pack
 // Returns structured JSON with content for each platform + image prompts
+// v2.1 - Topic-based image matching
 
 export const config = {
   runtime: 'edge',
@@ -157,6 +158,8 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
     const imagePrompt = contentPack.imagePrompt || contentBasedPrompt;
     console.log('Image prompt:', imagePrompt.substring(0, 100));
 
+    // IMPORTANT: Clear any images the AI might have returned - we'll generate our own
+    console.log('AI returned images:', contentPack.images);
     contentPack.images = {};
 
     try {
