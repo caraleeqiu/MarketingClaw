@@ -2272,19 +2272,36 @@
                 document.getElementById('step1').querySelector('.step-icon').textContent = '✓';
                 document.getElementById('step2').className = 'step active';
 
+                console.log('Calling /api/generate-pack with:', { business, topic });
+
+                // Create AbortController for timeout (60 seconds)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000);
+
                 // Call API
                 const response = await fetch('/api/generate-pack', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ business, topic })
+                    body: JSON.stringify({ business, topic }),
+                    signal: controller.signal
                 });
+
+                clearTimeout(timeoutId);
+                console.log('API response status:', response.status);
 
                 // Step 2: Done
                 document.getElementById('step2').className = 'step done';
                 document.getElementById('step2').querySelector('.step-icon').textContent = '✓';
                 document.getElementById('step3').className = 'step active';
 
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API error response:', errorText);
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
                 const data = await response.json();
+                console.log('API response data:', data.success ? 'Success' : 'Failed', data.error || '');
 
                 // Step 3: Done
                 await new Promise(r => setTimeout(r, 500));
@@ -2298,7 +2315,16 @@
                 }
             } catch (error) {
                 console.error('Generate pack error:', error);
-                addMessage('assistant', '⚠️ Error generating content pack. Please try again.');
+                console.error('Error name:', error.name);
+                console.error('Error message:', error.message);
+
+                let errorMsg = 'Error generating content pack. Please try again.';
+                if (error.name === 'AbortError') {
+                    errorMsg = 'Request timed out (60s). The server may be slow. Please try again.';
+                } else if (error.message) {
+                    errorMsg = error.message;
+                }
+                addMessage('assistant', `⚠️ ${errorMsg}. Check browser console (F12) for details.`);
             }
         }
 
@@ -3500,8 +3526,14 @@ For example: "Austin, TX 78704"`);
                 </div>
             `);
 
-            // Call actual API
+            // Call actual API with timeout handling
             try {
+                console.log('Calling /api/generate-pack with:', { business: biz, topic });
+
+                // Create AbortController for timeout (60 seconds - Imagen takes ~11s)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000);
+
                 const response = await fetch('/api/generate-pack', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -3514,10 +3546,21 @@ For example: "Austin, TX 78704"`);
                             phone: biz.phone
                         },
                         topic: topic
-                    })
+                    }),
+                    signal: controller.signal
                 });
 
+                clearTimeout(timeoutId);
+                console.log('API response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API error response:', errorText);
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
                 const data = await response.json();
+                console.log('API response data:', data.success ? 'Success' : 'Failed', data.error || '');
 
                 // Mark all as done
                 document.getElementById('gen-google').textContent = '✅';
@@ -3529,13 +3572,25 @@ For example: "Austin, TX 78704"`);
                 if (data.success && data.pack) {
                     displayContentPack(data.pack);
                 } else {
-                    addChatBubble('assistant', '⚠️ Sorry, there was an error generating content. Please try again.');
+                    addChatBubble('assistant', `⚠️ API returned error: ${data.error || 'Unknown error'}. Please try again.`);
                 }
             } catch (error) {
+                console.error('Generate pack error:', error);
+                console.error('Error name:', error.name);
+                console.error('Error message:', error.message);
+
                 document.getElementById('gen-google').textContent = '❌';
                 document.getElementById('gen-nextdoor').textContent = '❌';
                 document.getElementById('gen-facebook').textContent = '❌';
-                addChatBubble('assistant', '⚠️ Connection error. Please check your internet and try again.');
+
+                let errorMsg = 'Connection failed';
+                if (error.name === 'AbortError') {
+                    errorMsg = 'Request timed out (60s). The server may be slow.';
+                } else if (error.message) {
+                    errorMsg = error.message;
+                }
+
+                addChatBubble('assistant', `⚠️ Error: ${errorMsg}. Check browser console (F12) for details.`);
             }
         }
 
@@ -4499,18 +4554,38 @@ Your satisfaction matters to us.
                 }
                 try {
                     const prompt = `Professional ${trade} doing ${topic.title.toLowerCase()}, marketing photo, clean modern style`;
+                    console.log('Generating image for:', cacheKey);
+
+                    // Timeout after 30 seconds for individual images
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
                     const response = await fetch('/api/generate-image', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt, platform })
+                        body: JSON.stringify({ prompt, platform }),
+                        signal: controller.signal
                     });
+
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        console.error('Image API error:', response.status);
+                        return null;
+                    }
+
                     const data = await response.json();
                     if (data.success && data.image) {
                         generatedPostImages[cacheKey] = data.image;
+                        console.log('Image generated for:', cacheKey);
                         return data.image;
                     }
                 } catch (e) {
-                    console.error('Image generation error:', e);
+                    if (e.name === 'AbortError') {
+                        console.error('Image generation timed out:', cacheKey);
+                    } else {
+                        console.error('Image generation error:', e);
+                    }
                 }
                 return null;
             };
