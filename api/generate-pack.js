@@ -145,13 +145,22 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
       });
     }
 
-    // Generate image using Gemini Imagen
-    const imagePrompt = contentPack.imagePrompt ||
-      `Professional ${business.trade} technician at work, marketing photo, warm lighting, trustworthy, clean workspace`;
+    // Build image prompt from ACTUAL generated content
+    // Extract key themes from the generated post content
+    const googleContent = contentPack.platforms?.google?.content || '';
+    const googleTitle = contentPack.platforms?.google?.title || '';
+    const postText = `${googleTitle} ${googleContent}`.substring(0, 200);
+
+    // Create a content-aware image prompt
+    const contentBasedPrompt = `Professional marketing photo for: ${postText}. Style: clean, modern, trustworthy, warm lighting, suitable for ${business.trade} business marketing.`;
+
+    const imagePrompt = contentPack.imagePrompt || contentBasedPrompt;
+    console.log('Image prompt:', imagePrompt.substring(0, 100));
 
     contentPack.images = {};
 
     try {
+      console.log('Calling Imagen API...');
       const imgResponse = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${apiKey}`,
         {
@@ -168,20 +177,27 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
         }
       );
 
+      console.log('Imagen response status:', imgResponse.status);
+
       if (imgResponse.ok) {
         const imgData = await imgResponse.json();
+        console.log('Imagen response has predictions:', !!imgData.predictions?.[0]);
         if (imgData.predictions?.[0]?.bytesBase64Encoded) {
           const base64 = imgData.predictions[0].bytesBase64Encoded;
           contentPack.images.google = `data:image/png;base64,${base64}`;
           contentPack.images.nextdoor = contentPack.images.google;
           contentPack.images.facebook = contentPack.images.google;
+          console.log('Imagen SUCCESS - image generated');
         }
       } else {
-        console.error('Imagen error:', await imgResponse.text());
+        const errorText = await imgResponse.text();
+        console.error('Imagen error:', errorText);
       }
     } catch (e) {
       console.error('Image generation failed:', e);
     }
+
+    console.log('Final images:', contentPack.images.google ? 'Imagen generated' : 'Using fallback');
 
     // Fallback - use Topic + Trade based image selection
     if (!contentPack.images.google) {
@@ -238,15 +254,20 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
         realtor: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&w=800'
       };
 
-      // Detect topic type from the topic string
-      const topicLower = topic.toLowerCase();
+      // Detect topic type from BOTH the topic string AND the actual generated content
+      const googleContent = contentPack.platforms?.google?.content || '';
+      const googleTitle = contentPack.platforms?.google?.title || '';
+      const allText = `${topic} ${googleTitle} ${googleContent}`.toLowerCase();
+
       let detectedTopic = 'quality'; // default
       for (const [topicType, keywords] of Object.entries(topicKeywords)) {
-        if (keywords.some(kw => topicLower.includes(kw))) {
+        if (keywords.some(kw => allText.includes(kw))) {
           detectedTopic = topicType;
           break;
         }
       }
+
+      console.log('Topic detection:', { topic, detectedTopic, matchedIn: allText.substring(0, 100) });
 
       // Get topic-specific images or fall back to trade default
       const selectedImages = topicImages[detectedTopic] || [tradeImages[business.trade?.toLowerCase()] || tradeImages.plumber];
