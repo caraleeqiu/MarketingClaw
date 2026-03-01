@@ -169,7 +169,7 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
     if (topicLower.includes('spring') || topicLower.includes('inspect')) {
       sceneDescription = `professional ${tradeVisuals}, inspecting home exterior on beautiful spring day, blooming flowers in background, bright natural sunlight, homeowner watching satisfied`;
     } else if (topicLower.includes('emergency') || topicLower.includes('urgent') || topicLower.includes('24')) {
-      sceneDescription = `heroic ${tradeVisuals}, arriving for emergency service, dramatic lighting, ready to help, trustworthy and reliable appearance`;
+      sceneDescription = `professional ${tradeVisuals}, responding to home service call at night, van with company logo in background, confident and reliable, residential neighborhood setting, ready with tools`;
     } else if (topicLower.includes('discount') || topicLower.includes('off') || topicLower.includes('special') || topicLower.includes('save')) {
       sceneDescription = `smiling ${tradeVisuals}, in branded uniform, bright cheerful setting, clean modern home background, welcoming and friendly`;
     } else if (topicLower.includes('safety') || topicLower.includes('tip') || topicLower.includes('guide')) {
