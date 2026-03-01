@@ -279,14 +279,14 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
         ]
       };
 
-      // Trade-specific default images (fallback)
+      // Trade-specific default images (fallback) - [google/facebook, nextdoor]
       const tradeImages = {
-        plumber: 'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=800',
-        electrician: 'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=800',
-        hvac: 'https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&w=800',
-        roofer: 'https://images.pexels.com/photos/8961001/pexels-photo-8961001.jpeg?auto=compress&w=800',
-        landscaper: 'https://images.pexels.com/photos/1453499/pexels-photo-1453499.jpeg?auto=compress&w=800',
-        realtor: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&w=800'
+        plumber: ['/images/plumber-toilet-repair.jpg', '/images/plumber-hot-water.jpg'],
+        electrician: ['https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=800'],
+        hvac: ['https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&w=800'],
+        roofer: ['https://images.pexels.com/photos/8961001/pexels-photo-8961001.jpeg?auto=compress&w=800'],
+        landscaper: ['https://images.pexels.com/photos/1453499/pexels-photo-1453499.jpeg?auto=compress&w=800'],
+        realtor: ['https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&w=800']
       };
 
       // Detect topic type from BOTH the topic string AND the actual generated content
@@ -304,8 +304,8 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
 
       console.log('Topic detection:', { topic, detectedTopic, matchedIn: allText.substring(0, 100) });
 
-      // Get topic-specific images or fall back to trade default
-      const selectedImages = topicImages[detectedTopic] || [tradeImages[business.trade?.toLowerCase()] || tradeImages.plumber];
+      // Get topic-specific images or fall back to trade default (tradeImages is now array)
+      const selectedImages = topicImages[detectedTopic] || tradeImages[business.trade?.toLowerCase()] || tradeImages.plumber;
       const mainImage = selectedImages[0];
       const altImage = selectedImages[1] || mainImage;
 
