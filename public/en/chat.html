@@ -4252,28 +4252,52 @@ Your satisfaction matters to us.
 
         // ========== HISTORY FUNCTIONS ==========
         function saveToHistory(pack, biz, topic) {
-            const history = JSON.parse(localStorage.getItem('marketingclaw_history') || '[]');
-            const today = new Date().toISOString().split('T')[0];
+            try {
+                const history = JSON.parse(localStorage.getItem('marketingclaw_history') || '[]');
+                const today = new Date().toISOString().split('T')[0];
 
-            const entry = {
-                id: Date.now(),
-                date: today,
-                time: new Date().toLocaleTimeString(),
-                business: biz.name,
-                trade: biz.trade,
-                location: biz.location || 'Local Area',
-                phone: biz.phone || '(555) 123-4567',
-                topic: topic,
-                platforms: Object.keys(pack.platforms),
-                status: 'draft', // draft, published
-                pack: pack
-            };
+                // Create a lightweight copy of pack WITHOUT base64 images (they're too large for localStorage)
+                const lightPack = {
+                    ...pack,
+                    images: {} // Clear images to save space
+                };
+                // Store only image URLs, not base64 data
+                if (pack.images) {
+                    for (const [key, val] of Object.entries(pack.images)) {
+                        // Only keep URLs, skip base64 data (starts with "data:")
+                        if (val && !val.startsWith('data:')) {
+                            lightPack.images[key] = val;
+                        }
+                    }
+                }
 
-            history.unshift(entry);
-            // Keep last 50 entries
-            if (history.length > 50) history.pop();
+                const entry = {
+                    id: Date.now(),
+                    date: today,
+                    time: new Date().toLocaleTimeString(),
+                    business: biz.name,
+                    trade: biz.trade,
+                    location: biz.location || 'Local Area',
+                    phone: biz.phone || '(555) 123-4567',
+                    topic: topic,
+                    platforms: Object.keys(pack.platforms),
+                    status: 'draft', // draft, published
+                    pack: lightPack
+                };
 
-            localStorage.setItem('marketingclaw_history', JSON.stringify(history));
+                history.unshift(entry);
+                // Keep last 20 entries (reduced from 50 to save space)
+                while (history.length > 20) history.pop();
+
+                localStorage.setItem('marketingclaw_history', JSON.stringify(history));
+            } catch (e) {
+                console.warn('Failed to save to history:', e.message);
+                // If still fails, clear old history and try again
+                if (e.name === 'QuotaExceededError') {
+                    localStorage.removeItem('marketingclaw_history');
+                    console.log('Cleared old history due to quota');
+                }
+            }
         }
 
         function showHistory() {
