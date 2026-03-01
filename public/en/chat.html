@@ -2349,7 +2349,9 @@
             const trade = biz.trade || 'plumber';
             const image = getReliableImage(pack, 'google', trade);
             const fallback = fallbackImages[trade] || fallbackImages.default;
-            const desc = content.content.substring(0, 120);
+            // Get first paragraph or first 200 chars, whichever is shorter
+            const firstPara = content.content.split('\n')[0];
+            const desc = firstPara.length > 200 ? firstPara.substring(0, 200) : firstPara;
             const city = biz.location.split(',')[0];
             const cardId = 'gbp-card-' + Date.now();
 
@@ -2373,9 +2375,9 @@
                         <button class="gbp-action-btn secondary">📞 Call</button>
                         <button class="gbp-action-btn secondary">🌐 Website</button>
                     </div>
-                    <div class="gbp-photos" style="aspect-ratio: 4/3; overflow: hidden;">
-                        <img src="${image}" alt="Photo 1" style="width: 50%; height: 100%; object-fit: cover;" onerror="this.src='${fallback}'">
-                        <img src="${image}" alt="Photo 2" style="width: 50%; height: 100%; object-fit: cover; filter: brightness(0.95);" onerror="this.src='${fallback}'">
+                    <div class="gbp-photos" style="display: flex; gap: 4px; padding: 0 16px; height: 200px;">
+                        <img src="${image}" alt="Photo 1" style="flex: 1; height: 100%; object-fit: cover; border-radius: 8px;" onerror="this.src='${fallback}'">
+                        <img src="${image}" alt="Photo 2" style="flex: 1; height: 100%; object-fit: cover; border-radius: 8px; filter: brightness(0.95);" onerror="this.src='${fallback}'">
                     </div>
                     <div class="gbp-tabs">
                         <div class="gbp-tab active" onclick="switchGbpTab('${cardId}', 'overview', this)">OVERVIEW</div>
