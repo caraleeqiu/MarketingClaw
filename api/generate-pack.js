@@ -152,14 +152,14 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
     const topicLower = topic.toLowerCase();
     const trade = business.trade || 'plumber';
 
-    // Trade-specific visual keywords to help AI understand the profession
+    // Trade-specific visual keywords - very specific to avoid confusion
     const tradeKeywords = {
-      plumber: 'licensed plumber wearing blue work uniform, holding pipe wrench, working on water pipes and faucets, copper pipes visible, NOT painting NOT plastering NOT drywall',
-      electrician: 'licensed electrician in work clothes, working on electrical panel with wires and circuit breakers, holding voltage tester, NOT plumbing',
-      hvac: 'HVAC technician in uniform, working on air conditioning unit or furnace, ductwork visible, holding HVAC tools',
-      roofer: 'roofer on rooftop with shingles, roofing hammer and materials, safety harness, residential roof',
-      landscaper: 'landscaper in outdoor setting, lawn mower or garden tools, plants and grass, residential yard',
-      realtor: 'real estate agent in professional attire, holding house keys, standing near home exterior with For Sale sign'
+      plumber: 'plumber in blue coveralls fixing sink pipes under kitchen cabinet, pipe wrench in hand, copper water pipes, PVC drain pipes',
+      electrician: 'electrician working on electrical breaker box, multimeter in hand, colorful wires, circuit panel open',
+      hvac: 'HVAC technician servicing air conditioner outdoor unit, refrigerant gauges, AC compressor',
+      roofer: 'roofer installing asphalt shingles on house roof, nail gun, roofing felt visible',
+      landscaper: 'landscaper mowing green lawn with riding mower, flower beds, residential garden',
+      realtor: 'real estate agent holding sold sign in front of house, professional suit, house keys'
     };
     const tradeVisuals = tradeKeywords[trade] || tradeKeywords.plumber;
 
