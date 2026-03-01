@@ -183,46 +183,84 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
       console.error('Image generation failed:', e);
     }
 
-    // Fallback - use different Pexels photos for each platform
+    // Fallback - use Topic + Trade based image selection
     if (!contentPack.images.google) {
-      const tradeImages = {
-        plumber: [
-          'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=800',
-          'https://images.pexels.com/photos/6419126/pexels-photo-6419126.jpeg?auto=compress&w=800',
-          'https://images.pexels.com/photos/6419135/pexels-photo-6419135.jpeg?auto=compress&w=800'
+      // Topic-based image keywords mapping
+      const topicKeywords = {
+        spring: ['spring', 'maintenance', 'inspection', 'seasonal', 'checkup'],
+        emergency: ['emergency', 'urgent', 'fast', '24/7', 'immediate', 'quick'],
+        discount: ['off', 'special', 'discount', 'deal', 'save', 'offer', 'price'],
+        safety: ['safety', 'safe', 'protect', 'secure', 'guide', 'tips'],
+        warning: ['warning', 'signs', 'watch', 'problem', 'issue', 'danger'],
+        diy: ['diy', 'tips', 'trick', 'how to', 'guide', 'advice'],
+        quality: ['quality', 'professional', 'expert', 'best', 'trusted']
+      };
+
+      // Topic-specific images (general, works for all trades)
+      const topicImages = {
+        spring: [
+          'https://images.pexels.com/photos/5691622/pexels-photo-5691622.jpeg?auto=compress&w=800',
+          'https://images.pexels.com/photos/5691618/pexels-photo-5691618.jpeg?auto=compress&w=800'
         ],
-        electrician: [
+        emergency: [
+          'https://images.pexels.com/photos/8005368/pexels-photo-8005368.jpeg?auto=compress&w=800',
+          'https://images.pexels.com/photos/5691636/pexels-photo-5691636.jpeg?auto=compress&w=800'
+        ],
+        discount: [
+          'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&w=800',
+          'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&w=800'
+        ],
+        safety: [
+          'https://images.pexels.com/photos/5691625/pexels-photo-5691625.jpeg?auto=compress&w=800',
+          'https://images.pexels.com/photos/5691629/pexels-photo-5691629.jpeg?auto=compress&w=800'
+        ],
+        warning: [
+          'https://images.pexels.com/photos/5691631/pexels-photo-5691631.jpeg?auto=compress&w=800',
+          'https://images.pexels.com/photos/5691634/pexels-photo-5691634.jpeg?auto=compress&w=800'
+        ],
+        diy: [
+          'https://images.pexels.com/photos/4246120/pexels-photo-4246120.jpeg?auto=compress&w=800',
+          'https://images.pexels.com/photos/4246119/pexels-photo-4246119.jpeg?auto=compress&w=800'
+        ],
+        quality: [
           'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=800',
-          'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=800',
-          'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=800'
-        ],
-        hvac: [
-          'https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&w=800',
-          'https://images.pexels.com/photos/5463576/pexels-photo-5463576.jpeg?auto=compress&w=800',
-          'https://images.pexels.com/photos/4489765/pexels-photo-4489765.jpeg?auto=compress&w=800'
-        ],
-        roofer: [
-          'https://images.pexels.com/photos/8961001/pexels-photo-8961001.jpeg?auto=compress&w=800',
-          'https://images.pexels.com/photos/8961004/pexels-photo-8961004.jpeg?auto=compress&w=800',
-          'https://images.pexels.com/photos/7937944/pexels-photo-7937944.jpeg?auto=compress&w=800'
-        ],
-        landscaper: [
-          'https://images.pexels.com/photos/1453499/pexels-photo-1453499.jpeg?auto=compress&w=800',
-          'https://images.pexels.com/photos/1301856/pexels-photo-1301856.jpeg?auto=compress&w=800',
-          'https://images.pexels.com/photos/1601495/pexels-photo-1601495.jpeg?auto=compress&w=800'
-        ],
-        realtor: [
-          'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&w=800',
-          'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&w=800',
-          'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&w=800'
+          'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=800'
         ]
       };
-      const imgs = tradeImages[business.trade?.toLowerCase()] || tradeImages.plumber;
-      contentPack.images = {
-        google: imgs[0],
-        nextdoor: imgs[1],
-        facebook: imgs[2]
+
+      // Trade-specific default images (fallback)
+      const tradeImages = {
+        plumber: 'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=800',
+        electrician: 'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=800',
+        hvac: 'https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&w=800',
+        roofer: 'https://images.pexels.com/photos/8961001/pexels-photo-8961001.jpeg?auto=compress&w=800',
+        landscaper: 'https://images.pexels.com/photos/1453499/pexels-photo-1453499.jpeg?auto=compress&w=800',
+        realtor: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&w=800'
       };
+
+      // Detect topic type from the topic string
+      const topicLower = topic.toLowerCase();
+      let detectedTopic = 'quality'; // default
+      for (const [topicType, keywords] of Object.entries(topicKeywords)) {
+        if (keywords.some(kw => topicLower.includes(kw))) {
+          detectedTopic = topicType;
+          break;
+        }
+      }
+
+      // Get topic-specific images or fall back to trade default
+      const selectedImages = topicImages[detectedTopic] || [tradeImages[business.trade?.toLowerCase()] || tradeImages.plumber];
+      const mainImage = selectedImages[0];
+      const altImage = selectedImages[1] || mainImage;
+
+      contentPack.images = {
+        google: mainImage,
+        nextdoor: altImage,
+        facebook: mainImage
+      };
+
+      // Store detected topic for frontend reference
+      contentPack.detectedTopic = detectedTopic;
     }
 
     return new Response(JSON.stringify({

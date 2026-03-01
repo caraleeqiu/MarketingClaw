@@ -2464,20 +2464,36 @@
             }
         }
 
-        // Reliable fallback images for each trade
+        // Reliable fallback images - used when pack images are missing
+        // Primary fallbacks are trade-based (for general service images)
         const fallbackImages = {
             plumber: 'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=800',
             electrician: 'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=800',
             hvac: 'https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&w=800',
             roofer: 'https://images.pexels.com/photos/8961001/pexels-photo-8961001.jpeg?auto=compress&w=800',
+            landscaper: 'https://images.pexels.com/photos/1453499/pexels-photo-1453499.jpeg?auto=compress&w=800',
+            realtor: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&w=800',
             default: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&w=800'
         };
 
+        // Topic-based fallback images - matches topics in the content
+        const topicFallbackImages = {
+            spring: 'https://images.pexels.com/photos/5691622/pexels-photo-5691622.jpeg?auto=compress&w=800',
+            emergency: 'https://images.pexels.com/photos/8005368/pexels-photo-8005368.jpeg?auto=compress&w=800',
+            discount: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&w=800',
+            safety: 'https://images.pexels.com/photos/5691625/pexels-photo-5691625.jpeg?auto=compress&w=800',
+            warning: 'https://images.pexels.com/photos/5691631/pexels-photo-5691631.jpeg?auto=compress&w=800',
+            diy: 'https://images.pexels.com/photos/4246120/pexels-photo-4246120.jpeg?auto=compress&w=800',
+            quality: 'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=800'
+        };
+
         function getReliableImage(pack, platform, trade) {
+            // First try pack.images (which now contains topic-based images from the API)
             const img = pack?.images?.[platform];
             if (img && !img.includes('undefined') && !img.includes('null')) {
                 return img;
             }
+            // Fallback to trade-based image if pack image is missing
             return fallbackImages[trade] || fallbackImages.default;
         }
 
@@ -4309,16 +4325,65 @@ Your satisfaction matters to us.
             }
         }
 
-        // Auto Publish - pre-generated posts data
+        // Auto Publish - pre-generated posts data with TOPIC-SPECIFIC images
+        // Each topic has its own image that matches the content theme
         const autoPostTopics = [
-            { icon: '🌸', title: 'Spring Maintenance Tips', content: 'Spring is here! Time to check your plumbing for winter damage.' },
-            { icon: '💡', title: '5 Warning Signs', content: 'Watch for these warning signs that indicate you need professional help.' },
-            { icon: '🔥', title: '$50 Off Special', content: 'Limited time offer! Get $50 off your first service call.' },
-            { icon: '🏠', title: 'Home Safety Guide', content: 'Keep your home safe with these essential maintenance tips.' },
-            { icon: '⚡', title: 'Emergency Prep', content: 'Be prepared for emergencies with our quick response guide.' },
-            { icon: '💰', title: 'Money-Saving Tips', content: 'Save money on utility bills with these simple tricks.' },
-            { icon: '📋', title: 'Seasonal Checklist', content: 'Your complete seasonal maintenance checklist.' },
-            { icon: '🔧', title: 'DIY vs Pro', content: 'Know when to DIY and when to call a professional.' }
+            {
+                icon: '🌸',
+                title: 'Spring Maintenance Tips',
+                content: 'Spring is here! Time to check your plumbing for winter damage.',
+                topicType: 'spring',
+                image: 'https://images.pexels.com/photos/5691622/pexels-photo-5691622.jpeg?auto=compress&w=200'
+            },
+            {
+                icon: '💡',
+                title: '5 Warning Signs',
+                content: 'Watch for these warning signs that indicate you need professional help.',
+                topicType: 'warning',
+                image: 'https://images.pexels.com/photos/5691631/pexels-photo-5691631.jpeg?auto=compress&w=200'
+            },
+            {
+                icon: '🔥',
+                title: '$50 Off Special',
+                content: 'Limited time offer! Get $50 off your first service call.',
+                topicType: 'discount',
+                image: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&w=200'
+            },
+            {
+                icon: '🏠',
+                title: 'Home Safety Guide',
+                content: 'Keep your home safe with these essential maintenance tips.',
+                topicType: 'safety',
+                image: 'https://images.pexels.com/photos/5691625/pexels-photo-5691625.jpeg?auto=compress&w=200'
+            },
+            {
+                icon: '⚡',
+                title: 'Emergency Prep',
+                content: 'Be prepared for emergencies with our quick response guide.',
+                topicType: 'emergency',
+                image: 'https://images.pexels.com/photos/8005368/pexels-photo-8005368.jpeg?auto=compress&w=200'
+            },
+            {
+                icon: '💰',
+                title: 'Money-Saving Tips',
+                content: 'Save money on utility bills with these simple tricks.',
+                topicType: 'diy',
+                image: 'https://images.pexels.com/photos/4246120/pexels-photo-4246120.jpeg?auto=compress&w=200'
+            },
+            {
+                icon: '📋',
+                title: 'Seasonal Checklist',
+                content: 'Your complete seasonal maintenance checklist.',
+                topicType: 'spring',
+                image: 'https://images.pexels.com/photos/5691618/pexels-photo-5691618.jpeg?auto=compress&w=200'
+            },
+            {
+                icon: '🔧',
+                title: 'DIY vs Pro',
+                content: 'Know when to DIY and when to call a professional.',
+                topicType: 'diy',
+                image: 'https://images.pexels.com/photos/4246119/pexels-photo-4246119.jpeg?auto=compress&w=200'
+            }
         ];
 
         function showAutoPublish() {
@@ -4420,49 +4485,47 @@ Your satisfaction matters to us.
                 });
             }
 
-            // Trade-specific images for Auto Publish
-            const tradePostImages = {
-                plumber: [
-                    'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/6419126/pexels-photo-6419126.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/6419135/pexels-photo-6419135.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/6419121/pexels-photo-6419121.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/6419119/pexels-photo-6419119.jpeg?auto=compress&w=200',
+            // Topic-specific images - maps topicType to multiple image options
+            const topicImages = {
+                spring: [
+                    'https://images.pexels.com/photos/5691622/pexels-photo-5691622.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/5691618/pexels-photo-5691618.jpeg?auto=compress&w=200'
+                ],
+                emergency: [
+                    'https://images.pexels.com/photos/8005368/pexels-photo-8005368.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/5691636/pexels-photo-5691636.jpeg?auto=compress&w=200'
+                ],
+                discount: [
+                    'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&w=200'
+                ],
+                safety: [
+                    'https://images.pexels.com/photos/5691625/pexels-photo-5691625.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/5691629/pexels-photo-5691629.jpeg?auto=compress&w=200'
+                ],
+                warning: [
+                    'https://images.pexels.com/photos/5691631/pexels-photo-5691631.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/5691634/pexels-photo-5691634.jpeg?auto=compress&w=200'
+                ],
+                diy: [
+                    'https://images.pexels.com/photos/4246120/pexels-photo-4246120.jpeg?auto=compress&w=200',
+                    'https://images.pexels.com/photos/4246119/pexels-photo-4246119.jpeg?auto=compress&w=200'
+                ],
+                quality: [
+                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200',
                     'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=200'
-                ],
-                electrician: [
-                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200'
-                ],
-                hvac: [
-                    'https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/5463576/pexels-photo-5463576.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/4489765/pexels-photo-4489765.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/5463576/pexels-photo-5463576.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/4489765/pexels-photo-4489765.jpeg?auto=compress&w=200'
-                ],
-                roofer: [
-                    'https://images.pexels.com/photos/8961001/pexels-photo-8961001.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/8961004/pexels-photo-8961004.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/7937944/pexels-photo-7937944.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/8961001/pexels-photo-8961001.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/8961004/pexels-photo-8961004.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/7937944/pexels-photo-7937944.jpeg?auto=compress&w=200'
                 ]
             };
-            const postImages = tradePostImages[biz.trade] || tradePostImages.plumber;
+            const defaultImage = 'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=200';
 
             const postsHTML = posts.map((post, idx) => {
                 const dateStr = post.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const isFirst = idx === 0;
-                // Use custom image index if set, otherwise use position-based
-                const imageIdx = customPostImages[idx] !== undefined ? customPostImages[idx] : idx;
-                const postImage = postImages[imageIdx % postImages.length];
+                // Use topic's embedded image, or lookup by topicType, with custom image index for cycling
+                const imageIdx = customPostImages[idx] !== undefined ? customPostImages[idx] : 0;
+                const topicType = post.topic.topicType || 'quality';
+                const topicImageArray = topicImages[topicType] || [defaultImage];
+                const postImage = post.topic.image || topicImageArray[imageIdx % topicImageArray.length];
 
                 return `
                     <div style="background: white; border-radius: 12px; overflow: hidden; border: 2px solid ${isFirst ? 'var(--primary)' : 'var(--border)'}; ${isFirst ? 'box-shadow: 0 4px 12px rgba(255,107,53,0.2);' : ''}">
@@ -4565,14 +4628,15 @@ Your satisfaction matters to us.
                 newTopic = autoPostTopics[Math.floor(Math.random() * autoPostTopics.length)];
             } while (newTopic.title === currentTopic.title && autoPostTopics.length > 1);
 
-            // Save the new topic for this specific post
+            // Save the new topic for this specific post (includes topic-specific image)
             customPostTopics[idx] = newTopic;
 
-            // Also pick a new random image
-            customPostImages[idx] = Math.floor(Math.random() * 6);
+            // Cycle through topic-specific images (each topic has 2 image options)
+            const currentImageIdx = customPostImages[idx] || 0;
+            customPostImages[idx] = (currentImageIdx + 1) % 2;
 
             showToast('🔄 Week ' + (idx + 1) + ' changed to: ' + newTopic.title);
-            generatePostsList(); // Refresh with new topic
+            generatePostsList(); // Refresh with new topic and matching image
         }
 
         function approvePost(idx) {
