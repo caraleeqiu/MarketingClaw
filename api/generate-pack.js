@@ -158,49 +158,56 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
     const imagePrompt = contentPack.imagePrompt || contentBasedPrompt;
     console.log('Image prompt:', imagePrompt.substring(0, 100));
 
-    // IMPORTANT: Clear any images the AI might have returned - we'll generate our own
+    // Clear any images the AI might have returned - we'll generate our own
     console.log('AI returned images:', contentPack.images);
     contentPack.images = {};
 
+    // Try Gemini image generation using generateContent with IMAGE modality
     try {
-      console.log('Calling Imagen API...');
+      console.log('Calling Gemini image generation...');
       const imgResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            instances: [{ prompt: imagePrompt }],
-            parameters: {
-              sampleCount: 1,
-              aspectRatio: '1:1',
-              personGeneration: 'allow_adult'
+            contents: [{
+              parts: [{ text: `Generate a professional marketing image: ${imagePrompt}` }]
+            }],
+            generationConfig: {
+              responseModalities: ["IMAGE", "TEXT"],
+              responseMimeType: "text/plain"
             }
           }),
         }
       );
 
-      console.log('Imagen response status:', imgResponse.status);
+      console.log('Gemini image response status:', imgResponse.status);
 
       if (imgResponse.ok) {
         const imgData = await imgResponse.json();
-        console.log('Imagen response has predictions:', !!imgData.predictions?.[0]);
-        if (imgData.predictions?.[0]?.bytesBase64Encoded) {
-          const base64 = imgData.predictions[0].bytesBase64Encoded;
-          contentPack.images.google = `data:image/png;base64,${base64}`;
-          contentPack.images.nextdoor = contentPack.images.google;
-          contentPack.images.facebook = contentPack.images.google;
-          console.log('Imagen SUCCESS - image generated');
+        // Look for inline_data with image in the response
+        const parts = imgData.candidates?.[0]?.content?.parts || [];
+        for (const part of parts) {
+          if (part.inlineData?.mimeType?.startsWith('image/')) {
+            const base64 = part.inlineData.data;
+            const mimeType = part.inlineData.mimeType;
+            contentPack.images.google = `data:${mimeType};base64,${base64}`;
+            contentPack.images.nextdoor = contentPack.images.google;
+            contentPack.images.facebook = contentPack.images.google;
+            console.log('Gemini image SUCCESS');
+            break;
+          }
         }
       } else {
         const errorText = await imgResponse.text();
-        console.error('Imagen error:', errorText);
+        console.error('Gemini image error:', errorText);
       }
     } catch (e) {
       console.error('Image generation failed:', e);
     }
 
-    console.log('Final images:', contentPack.images.google ? 'Imagen generated' : 'Using fallback');
+    console.log('Image result:', contentPack.images.google ? 'AI generated' : 'Using fallback');
 
     // Fallback - use Topic + Trade based image selection
     if (!contentPack.images.google) {
