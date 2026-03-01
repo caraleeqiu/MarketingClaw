@@ -3920,17 +3920,22 @@ Your satisfaction matters to us.
 
         // Regenerate image for a specific platform
         async function regenerateImage(platform) {
+            console.log('regenerateImage called for:', platform);
+
             const pack = window.generatedContent?.pack;
-            const biz = window.businessInfo;
+            const biz = window.generatedContent?.biz || window.businessInfo;
             const topic = window.selectedTopicTitle || 'professional service';
 
+            console.log('Data check:', { hasPack: !!pack, hasBiz: !!biz, topic });
+
             if (!pack || !biz) {
-                showToast('No content available');
+                showToast('❌ No content available - generate first');
+                console.error('Missing data:', { pack, biz });
                 return;
             }
 
             // Show loading state
-            showToast('🔄 正在生成新图片...');
+            showToast('🔄 Generating new image...');
 
             try {
                 // Platform-specific style
@@ -3946,12 +3951,13 @@ Your satisfaction matters to us.
                 ];
                 const randomVariation = variations[Math.floor(Math.random() * variations.length)];
 
-                const prompt = `Professional ${biz.trade} marketing photo for ${topic}. ${platformStyle}. Lighting: ${randomVariation}, high-end commercial photography, 4K quality`;
+                const trade = biz.trade || 'professional';
+                const prompt = `Professional ${trade} marketing photo for ${topic}. ${platformStyle}. Lighting: ${randomVariation}, high-end commercial photography, 4K quality`;
 
                 console.log(`Regenerating ${platform} image:`, prompt);
 
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 30000);
+                const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
                 const response = await fetch('/api/generate-image', {
                     method: 'POST',
@@ -3963,6 +3969,7 @@ Your satisfaction matters to us.
                 clearTimeout(timeoutId);
 
                 const data = await response.json();
+                console.log('API response:', data.success);
 
                 if (data.success && data.image) {
                     // Only update this specific platform's image
@@ -3970,16 +3977,17 @@ Your satisfaction matters to us.
 
                     // Re-render the content
                     displayContentPack(pack);
-                    showToast('✅ ' + platform + ' 图片已更新!');
+                    showToast('✅ ' + platform + ' image updated!');
                 } else {
-                    showToast('❌ 生成失败，请重试');
+                    showToast('❌ Generation failed: ' + (data.error || 'unknown'));
+                    console.error('API error:', data);
                 }
             } catch (error) {
                 console.error('Regenerate image error:', error);
                 if (error.name === 'AbortError') {
-                    showToast('❌ 请求超时，请重试');
+                    showToast('❌ Request timeout, please retry');
                 } else {
-                    showToast('❌ 生成失败: ' + error.message);
+                    showToast('❌ Error: ' + error.message);
                 }
             }
         }
