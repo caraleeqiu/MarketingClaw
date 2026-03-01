@@ -162,46 +162,39 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
     console.log('AI returned images:', contentPack.images);
     contentPack.images = {};
 
-    // Try Gemini image generation using generateContent with IMAGE modality
+    // Generate images using Imagen 4.0 API (same as generate-image.js)
     try {
-      console.log('Calling Gemini image generation...');
+      console.log('Calling Imagen 4.0 API...');
       const imgResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{
-              parts: [{ text: `Generate a professional marketing image: ${imagePrompt}` }]
-            }],
-            generationConfig: {
-              responseModalities: ["IMAGE", "TEXT"],
-              responseMimeType: "text/plain"
+            instances: [{ prompt: imagePrompt }],
+            parameters: {
+              sampleCount: 1,
+              aspectRatio: '1:1',
+              personGeneration: 'dont_allow'
             }
           }),
         }
       );
 
-      console.log('Gemini image response status:', imgResponse.status);
+      console.log('Imagen response status:', imgResponse.status);
 
       if (imgResponse.ok) {
         const imgData = await imgResponse.json();
-        // Look for inline_data with image in the response
-        const parts = imgData.candidates?.[0]?.content?.parts || [];
-        for (const part of parts) {
-          if (part.inlineData?.mimeType?.startsWith('image/')) {
-            const base64 = part.inlineData.data;
-            const mimeType = part.inlineData.mimeType;
-            contentPack.images.google = `data:${mimeType};base64,${base64}`;
-            contentPack.images.nextdoor = contentPack.images.google;
-            contentPack.images.facebook = contentPack.images.google;
-            console.log('Gemini image SUCCESS');
-            break;
-          }
+        const base64 = imgData.predictions?.[0]?.bytesBase64Encoded;
+        if (base64) {
+          contentPack.images.google = `data:image/png;base64,${base64}`;
+          contentPack.images.nextdoor = contentPack.images.google;
+          contentPack.images.facebook = contentPack.images.google;
+          console.log('Imagen SUCCESS - image generated');
         }
       } else {
         const errorText = await imgResponse.text();
-        console.error('Gemini image error:', errorText);
+        console.error('Imagen error:', errorText);
       }
     } catch (e) {
       console.error('Image generation failed:', e);
