@@ -4150,6 +4150,8 @@ Your satisfaction matters to us.
                 time: new Date().toLocaleTimeString(),
                 business: biz.name,
                 trade: biz.trade,
+                location: biz.location || 'Local Area',
+                phone: biz.phone || '(555) 123-4567',
                 topic: topic,
                 platforms: Object.keys(pack.platforms),
                 status: 'draft', // draft, published
@@ -4244,10 +4246,18 @@ Your satisfaction matters to us.
             const entry = history.find(e => e.id === id);
 
             if (entry && entry.pack) {
-                window.generatedContent = { pack: entry.pack, biz: { name: entry.business, trade: entry.trade } };
-                window.businessInfo = { name: entry.business, trade: entry.trade };
+                const biz = {
+                    name: entry.business,
+                    trade: entry.trade,
+                    location: entry.location || 'Local Area',
+                    phone: entry.phone || '(555) 123-4567'
+                };
+                window.generatedContent = { pack: entry.pack, biz: biz };
+                window.businessInfo = biz;
                 window.selectedTopicTitle = entry.topic;
                 displayContentPack(entry.pack);
+            } else {
+                showToast('Unable to load content');
             }
         }
 
