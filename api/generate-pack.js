@@ -304,8 +304,18 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
 
       console.log('Topic detection:', { topic, detectedTopic, matchedIn: allText.substring(0, 100) });
 
-      // Get topic-specific images or fall back to trade default (tradeImages is now array)
-      const selectedImages = topicImages[detectedTopic] || tradeImages[business.trade?.toLowerCase()] || tradeImages.plumber;
+      // For plumber, always use custom images; for others, use topic-based or trade default
+      const tradeLower = business.trade?.toLowerCase();
+      let selectedImages;
+
+      if (tradeLower === 'plumber') {
+        // Plumber always uses our custom images
+        selectedImages = tradeImages.plumber;
+      } else {
+        // Other trades use topic-based images or trade default
+        selectedImages = topicImages[detectedTopic] || tradeImages[tradeLower] || tradeImages.plumber;
+      }
+
       const mainImage = selectedImages[0];
       const altImage = selectedImages[1] || mainImage;
 
