@@ -167,7 +167,7 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
 
     // Topic-specific scenes with better visual appeal
     if (topicLower.includes('spring') || topicLower.includes('inspect')) {
-      sceneDescription = `close-up of professional ${tradeVisuals}, kneeling and inspecting outdoor water faucet on house exterior wall, spring garden with pink cherry blossoms visible, wearing work uniform, holding tools, focused on work`;
+      sceneDescription = `OUTDOOR spring scene with cherry blossom trees and colorful flowers, professional ${tradeVisuals} in the foreground inspecting an exterior house faucet, bright sunny day, residential backyard`;
     } else if (topicLower.includes('emergency') || topicLower.includes('urgent') || topicLower.includes('24')) {
       sceneDescription = `professional ${tradeVisuals}, responding to home service call at night, van with company logo in background, confident and reliable, residential neighborhood setting, ready with tools`;
     } else if (topicLower.includes('discount') || topicLower.includes('off') || topicLower.includes('special') || topicLower.includes('save')) {
