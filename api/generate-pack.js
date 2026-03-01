@@ -154,12 +154,12 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
 
     // Trade-specific visual keywords to help AI understand the profession
     const tradeKeywords = {
-      plumber: 'plumber with pipes, wrenches, water fixtures, plumbing tools',
-      electrician: 'electrician with electrical panel, wires, circuit breaker, voltage tester',
-      hvac: 'HVAC technician with air conditioning unit, ductwork, thermostat',
-      roofer: 'roofer on roof with shingles, roofing tools, ladder',
-      landscaper: 'landscaper with plants, lawn mower, garden tools',
-      realtor: 'real estate agent with house keys, property listing, home exterior'
+      plumber: 'licensed plumber wearing blue work uniform, holding pipe wrench, working on water pipes and faucets, copper pipes visible, NOT painting NOT plastering NOT drywall',
+      electrician: 'licensed electrician in work clothes, working on electrical panel with wires and circuit breakers, holding voltage tester, NOT plumbing',
+      hvac: 'HVAC technician in uniform, working on air conditioning unit or furnace, ductwork visible, holding HVAC tools',
+      roofer: 'roofer on rooftop with shingles, roofing hammer and materials, safety harness, residential roof',
+      landscaper: 'landscaper in outdoor setting, lawn mower or garden tools, plants and grass, residential yard',
+      realtor: 'real estate agent in professional attire, holding house keys, standing near home exterior with For Sale sign'
     };
     const tradeVisuals = tradeKeywords[trade] || tradeKeywords.plumber;
 
