@@ -4452,7 +4452,10 @@ Your satisfaction matters to us.
             setTimeout(() => generatePostsList(), 100);
         }
 
-        function generatePostsList() {
+        // Cache for generated images
+        let generatedPostImages = {};
+
+        async function generatePostsList() {
             const cycle = parseInt(document.getElementById('scheduleCycle').value);
             const platform = document.getElementById('schedulePlatform').value;
             const day = parseInt(document.getElementById('scheduleDay').value);
@@ -4486,47 +4489,58 @@ Your satisfaction matters to us.
                 });
             }
 
-            // Topic-specific images - maps topicType to multiple image options
-            const topicImages = {
-                spring: [
-                    'https://images.pexels.com/photos/5691622/pexels-photo-5691622.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/5691618/pexels-photo-5691618.jpeg?auto=compress&w=200'
-                ],
-                emergency: [
-                    'https://images.pexels.com/photos/8005368/pexels-photo-8005368.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/5691636/pexels-photo-5691636.jpeg?auto=compress&w=200'
-                ],
-                discount: [
-                    'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&w=200'
-                ],
-                safety: [
-                    'https://images.pexels.com/photos/5691625/pexels-photo-5691625.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/5691629/pexels-photo-5691629.jpeg?auto=compress&w=200'
-                ],
-                warning: [
-                    'https://images.pexels.com/photos/5691631/pexels-photo-5691631.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/5691634/pexels-photo-5691634.jpeg?auto=compress&w=200'
-                ],
-                diy: [
-                    'https://images.pexels.com/photos/4246120/pexels-photo-4246120.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/4246119/pexels-photo-4246119.jpeg?auto=compress&w=200'
-                ],
-                quality: [
-                    'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=200',
-                    'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=200'
-                ]
-            };
             const defaultImage = 'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=200';
+
+            // Generate images using API if not cached
+            const generateImageForPost = async (topic, trade, platform) => {
+                const cacheKey = `${trade}-${topic.topicType}-${platform}`;
+                if (generatedPostImages[cacheKey]) {
+                    return generatedPostImages[cacheKey];
+                }
+                try {
+                    const prompt = `Professional ${trade} doing ${topic.title.toLowerCase()}, marketing photo, clean modern style`;
+                    const response = await fetch('/api/generate-image', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt, platform })
+                    });
+                    const data = await response.json();
+                    if (data.success && data.image) {
+                        generatedPostImages[cacheKey] = data.image;
+                        return data.image;
+                    }
+                } catch (e) {
+                    console.error('Image generation error:', e);
+                }
+                return null;
+            };
+
+            // Show loading state first
+            document.getElementById('postsListArea').innerHTML = `
+                <div style="text-align: center; padding: 60px; color: var(--text-secondary);">
+                    <div style="font-size: 48px; margin-bottom: 12px;">🤖</div>
+                    <p>Generating AI images for ${biz.trade}...</p>
+                    <p style="font-size: 12px; margin-top: 8px;">This may take a moment</p>
+                </div>
+            `;
+
+            // Generate images for first few posts (limit to avoid long wait)
+            const imagesToGenerate = Math.min(cycle, 4);
+            for (let i = 0; i < imagesToGenerate; i++) {
+                const topic = customPostTopics[i] || autoPostTopics[i % autoPostTopics.length];
+                const cacheKey = `${biz.trade}-${topic.topicType}-${platform}`;
+                if (!generatedPostImages[cacheKey]) {
+                    const img = await generateImageForPost(topic, biz.trade, platform);
+                    if (img) generatedPostImages[cacheKey] = img;
+                }
+            }
 
             const postsHTML = posts.map((post, idx) => {
                 const dateStr = post.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const isFirst = idx === 0;
-                // Use topic's embedded image, or lookup by topicType, with custom image index for cycling
-                const imageIdx = customPostImages[idx] !== undefined ? customPostImages[idx] : 0;
                 const topicType = post.topic.topicType || 'quality';
-                const topicImageArray = topicImages[topicType] || [defaultImage];
-                const postImage = post.topic.image || topicImageArray[imageIdx % topicImageArray.length];
+                const cacheKey = `${biz.trade}-${topicType}-${platform}`;
+                const postImage = generatedPostImages[cacheKey] || defaultImage;
 
                 return `
                     <div style="background: white; border-radius: 12px; overflow: hidden; border: 2px solid ${isFirst ? 'var(--primary)' : 'var(--border)'}; ${isFirst ? 'box-shadow: 0 4px 12px rgba(255,107,53,0.2);' : ''}">
