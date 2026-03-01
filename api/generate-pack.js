@@ -13,7 +13,7 @@ IMPORTANT: Respond with ONLY valid JSON. Use \\n for line breaks in content.
 {
   "business": { "name": "", "trade": "", "location": "", "zip": "", "phone": "" },
   "topic": "main topic",
-  "imagePrompt": "professional photo of [trade] at work, marketing style",
+  "imagePrompt": "MUST match the topic! Examples: spring inspection -> 'plumber inspecting outdoor faucet in spring garden'; emergency -> 'plumber fixing burst pipe with water spray'; discount -> 'friendly plumber showing thumbs up with sale banner'; safety -> 'plumber checking water heater with flashlight'",
   "platforms": {
     "google": {
       "title": "max 58 chars",
@@ -37,7 +37,8 @@ CRITICAL RULES:
 - Use \\n for EVERY line break (not actual newlines in JSON)
 - Each bullet point (•) MUST be on its own line with \\n before it
 - PLAIN TEXT only, no markdown
-- Include phone number in every post`;
+- Include phone number in every post
+- imagePrompt MUST describe a scene that matches the marketing topic, not just generic work photo`;
 
 export default async function handler(req) {
   const headers = {
@@ -150,13 +151,36 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
     // Extract key themes from the generated post content
     const googleContent = contentPack.platforms?.google?.content || '';
     const googleTitle = contentPack.platforms?.google?.title || '';
-    const postText = `${googleTitle} ${googleContent}`.substring(0, 200);
 
-    // Create a content-aware image prompt
-    const contentBasedPrompt = `Professional marketing photo for: ${postText}. Style: clean, modern, trustworthy, warm lighting, suitable for ${business.trade} business marketing.`;
+    // Create a topic-focused image prompt
+    // Priority: AI-generated imagePrompt > topic-based fallback
+    let imagePrompt = contentPack.imagePrompt;
 
-    const imagePrompt = contentPack.imagePrompt || contentBasedPrompt;
-    console.log('Image prompt:', imagePrompt.substring(0, 100));
+    // If AI didn't provide a good prompt, create one based on topic
+    if (!imagePrompt || imagePrompt.includes('[trade]') || imagePrompt.length < 20) {
+      // Extract topic keywords for better image matching
+      const topicLower = topic.toLowerCase();
+      let sceneDescription = '';
+
+      if (topicLower.includes('spring') || topicLower.includes('inspect')) {
+        sceneDescription = `${business.trade} performing spring inspection, checking outdoor equipment, sunny day, garden visible`;
+      } else if (topicLower.includes('emergency') || topicLower.includes('urgent')) {
+        sceneDescription = `${business.trade} responding to emergency call, professional tools ready, urgent action scene`;
+      } else if (topicLower.includes('discount') || topicLower.includes('off') || topicLower.includes('special')) {
+        sceneDescription = `friendly ${business.trade} giving thumbs up, professional uniform, welcoming smile, promotional feel`;
+      } else if (topicLower.includes('safety') || topicLower.includes('tip')) {
+        sceneDescription = `${business.trade} demonstrating safety check, educational setting, pointing at equipment`;
+      } else if (topicLower.includes('winter') || topicLower.includes('freeze')) {
+        sceneDescription = `${business.trade} winterizing pipes, cold weather protection, insulation visible`;
+      } else {
+        sceneDescription = `professional ${business.trade} at work, ${googleTitle}, high quality service`;
+      }
+
+      imagePrompt = `Professional marketing photo: ${sceneDescription}. Style: clean, modern, trustworthy, warm lighting.`;
+    }
+
+    console.log('Topic:', topic);
+    console.log('Image prompt:', imagePrompt.substring(0, 150));
 
     // Clear any images the AI might have returned - we'll generate our own
     console.log('AI returned images:', contentPack.images);
