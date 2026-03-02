@@ -3,8 +3,11 @@
  * Platform-specific preview card rendering
  */
 
+import { fallbackImages } from './config.js';
+import { getReliableImage, capitalize } from './utils.js';
+
 // Google Business Preview Card
-function renderGooglePreview(pack, biz) {
+export function renderGooglePreview(pack, biz) {
     const content = pack.platforms.google;
     const trade = biz.trade || 'plumber';
     const image = getReliableImage(pack, 'google', trade);
@@ -39,13 +42,13 @@ function renderGooglePreview(pack, biz) {
                 <img src="${image}" alt="Photo 2" style="flex: 1; height: 100%; object-fit: cover; border-radius: 8px; filter: brightness(0.95);" onerror="this.src='${fallback}'">
             </div>
             <div class="gbp-tabs">
-                <div class="gbp-tab active" onclick="switchGbpTab('${cardId}', 'overview', this)">OVERVIEW</div>
-                <div class="gbp-tab" onclick="switchGbpTab('${cardId}', 'updates', this)">UPDATES</div>
-                <div class="gbp-tab" onclick="switchGbpTab('${cardId}', 'reviews', this)">REVIEWS</div>
+                <div class="gbp-tab active" onclick="window.switchGbpTab('${cardId}', 'overview', this)">OVERVIEW</div>
+                <div class="gbp-tab" onclick="window.switchGbpTab('${cardId}', 'updates', this)">UPDATES</div>
+                <div class="gbp-tab" onclick="window.switchGbpTab('${cardId}', 'reviews', this)">REVIEWS</div>
             </div>
             <div class="gbp-content" id="${cardId}-content">
                 <div class="gbp-tab-content active" data-tab="overview">
-                    <div class="gbp-desc" data-fulltext="${encodeURIComponent(content.content)}" onclick="toggleDescExpand(this)" style="cursor: pointer; white-space: pre-line;">
+                    <div class="gbp-desc" data-fulltext="${encodeURIComponent(content.content)}" onclick="window.toggleDescExpand(this)" style="cursor: pointer; white-space: pre-line;">
                         <span class="desc-text">${desc}...</span>
                         <span class="gbp-desc-arrow">›</span>
                     </div>
@@ -78,18 +81,19 @@ function renderGooglePreview(pack, biz) {
                 </div>
             </div>
             <div class="preview-actions" style="display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid #dadce0;">
-                <button onclick="regenerateImage('google')" style="padding: 10px; background: #fff3e0; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">🔄 换图</button>
-                <button onclick="openEditModal('google')" style="flex: 1; padding: 10px; background: #f1f3f4; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">✏️ Edit</button>
-                <button onclick="copyPlatformContent('google')" style="flex: 1; padding: 10px; background: #f1f3f4; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">📋 Copy</button>
-                <button onclick="openPublishModal('google')" style="flex: 1; padding: 10px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">🚀 Publish</button>
+                <button onclick="window.regenerateImage('google')" style="padding: 10px; background: #fff3e0; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">🔄 换图</button>
+                <button onclick="window.openEditModal('google')" style="flex: 1; padding: 10px; background: #f1f3f4; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">✏️ Edit</button>
+                <button onclick="window.copyPlatformContent('google')" style="flex: 1; padding: 10px; background: #f1f3f4; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">📋 Copy</button>
+                <button onclick="window.openPublishModal('google')" style="flex: 1; padding: 10px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">🚀 Publish</button>
             </div>
         </div>
     `;
 }
 
 // Switch GBP tabs
-function switchGbpTab(cardId, tab, clickedEl) {
+export function switchGbpTab(cardId, tab, clickedEl) {
     const card = document.getElementById(cardId);
+    if (!card) return;
     card.querySelectorAll('.gbp-tab').forEach(t => t.classList.remove('active'));
     clickedEl.classList.add('active');
     card.querySelectorAll('.gbp-tab-content').forEach(c => {
@@ -98,7 +102,7 @@ function switchGbpTab(cardId, tab, clickedEl) {
 }
 
 // Toggle description expand
-function toggleDescExpand(el) {
+export function toggleDescExpand(el) {
     const textEl = el.querySelector('.desc-text');
     const arrowEl = el.querySelector('.gbp-desc-arrow');
     const fullText = decodeURIComponent(el.dataset.fulltext || '');
@@ -116,7 +120,7 @@ function toggleDescExpand(el) {
 }
 
 // Facebook Preview Card
-function renderFacebookPreview(pack, biz) {
+export function renderFacebookPreview(pack, biz) {
     const content = pack.platforms.facebook;
     const trade = biz.trade || 'plumber';
     const image = getReliableImage(pack, 'facebook', trade);
@@ -124,7 +128,7 @@ function renderFacebookPreview(pack, biz) {
     const shortText = fullText.substring(0, 150);
 
     return `
-        <div class="fb-mobile" onclick="openPreviewModal('facebook')">
+        <div class="fb-mobile" onclick="window.openPreviewModal('facebook')">
             <div class="fb-preview-label">📘 Facebook Post Preview</div>
             <div class="fb-header">
                 <div class="fb-avatar">${biz.name.charAt(0)}</div>
@@ -158,16 +162,16 @@ function renderFacebookPreview(pack, biz) {
                 <div class="fb-action">↗️ Share</div>
             </div>
             <div class="preview-actions">
-                <button style="background: #fff3e0;" onclick="event.stopPropagation(); regenerateImage('facebook')">🔄 换图</button>
-                <button class="btn-edit" onclick="event.stopPropagation(); openEditModal('facebook')">✏️ Edit</button>
-                <button class="btn-publish-sm" onclick="event.stopPropagation(); quickPublish('facebook')">🚀 Publish</button>
+                <button style="background: #fff3e0;" onclick="event.stopPropagation(); window.regenerateImage('facebook')">🔄 换图</button>
+                <button class="btn-edit" onclick="event.stopPropagation(); window.openEditModal('facebook')">✏️ Edit</button>
+                <button class="btn-publish-sm" onclick="event.stopPropagation(); window.quickPublish('facebook')">🚀 Publish</button>
             </div>
         </div>
     `;
 }
 
 // Nextdoor Preview Card
-function renderNextdoorPreview(pack, biz) {
+export function renderNextdoorPreview(pack, biz) {
     const content = pack.platforms.nextdoor;
     const trade = biz.trade || 'plumber';
     const image = getReliableImage(pack, 'nextdoor', trade);
@@ -175,7 +179,7 @@ function renderNextdoorPreview(pack, biz) {
     const firstName = biz.name.split(' ')[0];
 
     return `
-        <div class="nd-preview" onclick="openPreviewModal('nextdoor')" style="width: 320px;">
+        <div class="nd-preview" onclick="window.openPreviewModal('nextdoor')" style="width: 320px;">
             <div style="background: #8bc34a; color: white; padding: 6px 12px; font-size: 12px; font-weight: 500; text-align: center;">🏘️ Nextdoor Post Preview</div>
             <div class="nd-header">
                 <div class="nd-avatar">🏠</div>
@@ -187,23 +191,23 @@ function renderNextdoorPreview(pack, biz) {
             <img class="nd-image" src="${image}" alt="Post image" style="aspect-ratio: 16/9; object-fit: cover; width: 100%;" onerror="this.src='${fallbackImages[trade] || fallbackImages.default}'">
             <div class="nd-content" style="white-space: pre-line;">${text}</div>
             <div class="preview-actions">
-                <button style="background: #fff3e0;" onclick="event.stopPropagation(); regenerateImage('nextdoor')">🔄 换图</button>
-                <button class="btn-edit" onclick="event.stopPropagation(); openEditModal('nextdoor')">✏️ Edit</button>
-                <button class="btn-publish-sm" onclick="event.stopPropagation(); quickPublish('nextdoor')">🚀 Publish</button>
+                <button style="background: #fff3e0;" onclick="event.stopPropagation(); window.regenerateImage('nextdoor')">🔄 换图</button>
+                <button class="btn-edit" onclick="event.stopPropagation(); window.openEditModal('nextdoor')">✏️ Edit</button>
+                <button class="btn-publish-sm" onclick="event.stopPropagation(); window.quickPublish('nextdoor')">🚀 Publish</button>
             </div>
         </div>
     `;
 }
 
 // Instagram Preview Card
-function renderInstagramPreview(pack, biz) {
+export function renderInstagramPreview(pack, biz) {
     const image = pack.images.facebook;
     const content = pack.platforms.facebook?.content || '';
     const text = content.substring(0, 80) + '...';
     const handle = biz.name.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_');
 
     return `
-        <div class="ig-preview" onclick="openPreviewModal('instagram')" style="width: 320px;">
+        <div class="ig-preview" onclick="window.openPreviewModal('instagram')" style="width: 320px;">
             <div style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; padding: 6px 12px; font-size: 12px; font-weight: 500; text-align: center;">📸 Instagram Post Preview</div>
             <div class="ig-header">
                 <div class="ig-avatar">${biz.name.charAt(0)}</div>
@@ -218,54 +222,16 @@ function renderInstagramPreview(pack, biz) {
             <div style="padding: 0 12px; font-size: 14px; font-weight: 600;">128 likes</div>
             <div class="ig-caption" style="white-space: pre-line;"><strong>${handle}</strong> ${text}</div>
             <div class="preview-actions">
-                <button class="btn-edit" onclick="event.stopPropagation(); openPreviewModal('instagram')">✏️ Edit</button>
-                <button class="btn-publish-sm" onclick="event.stopPropagation(); quickPublish('instagram')">🚀 Publish</button>
+                <button class="btn-edit" onclick="event.stopPropagation(); window.openPreviewModal('instagram')">✏️ Edit</button>
+                <button class="btn-publish-sm" onclick="event.stopPropagation(); window.quickPublish('instagram')">🚀 Publish</button>
             </div>
         </div>
     `;
-}
-
-// Display content pack
-function displayContentPack(pack) {
-    const chatArea = document.getElementById('chatArea');
-    const biz = window.businessInfo;
-
-    const gbpContent = generateGoogleBusinessContent(biz, pack);
-    const selectedPlatforms = getSelectedPlatforms();
-
-    window.generatedContent = { pack, gbp: gbpContent, biz };
-    saveToHistory(pack, biz, window.selectedTopicTitle || 'Marketing Content');
-
-    chatArea.innerHTML = `
-        <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div>
-                    <h2 style="margin-bottom: 4px;">✅ Content Ready</h2>
-                    <p style="color: var(--text-secondary);">${biz.name} • ${window.selectedTopicTitle || 'Marketing Content'}</p>
-                </div>
-                <button class="generate-pack-btn" onclick="publishAll()" style="margin: 0;">
-                    🚀 Publish All
-                </button>
-            </div>
-
-            <p style="margin-bottom: 16px; color: var(--text-secondary);">Click any card to preview, edit, or publish</p>
-
-            <div class="preview-grid">
-                ${selectedPlatforms.includes('google') ? renderGooglePreview(pack, biz) : ''}
-                ${selectedPlatforms.includes('facebook') ? renderFacebookPreview(pack, biz) : ''}
-                ${selectedPlatforms.includes('nextdoor') ? renderNextdoorPreview(pack, biz) : ''}
-                ${selectedPlatforms.includes('instagram') ? renderInstagramPreview(pack, biz) : ''}
-            </div>
-        </div>
-    `;
-
-    chatArea.scrollTop = 0;
 }
 
 // Generate Google Business Content (services, products, Q&A)
-function generateGoogleBusinessContent(biz, pack) {
+export function generateGoogleBusinessContent(biz, pack) {
     const trade = biz.trade || 'plumber';
-    const name = biz.name;
     const phone = biz.phone;
     const location = biz.location;
 
@@ -310,4 +276,10 @@ function generateGoogleBusinessContent(biz, pack) {
     ];
 
     return { services, qaItems };
+}
+
+// Export functions to window for HTML onclick handlers
+if (typeof window !== 'undefined') {
+    window.switchGbpTab = switchGbpTab;
+    window.toggleDescExpand = toggleDescExpand;
 }

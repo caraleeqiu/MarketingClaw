@@ -3,21 +3,26 @@
  * Handles all API calls to backend
  */
 
+import { state } from './state.js';
+import { platformImageStyles } from './config.js';
+import { showToast, delay } from './utils.js';
+import { addMessage, addLoadingMessage, displayContentPack } from './chat-ui.js';
+
 // Send chat message
-async function sendMessage() {
+export async function sendMessage() {
     const input = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendBtn');
     const message = input.value.trim();
-    if (!message || isLoading) return;
+    if (!message || state.isLoading) return;
 
     // Add user message
     addMessage('user', message);
-    conversationHistory.push({ role: 'user', content: message });
+    state.conversationHistory.push({ role: 'user', content: message });
     input.value = '';
     input.style.height = 'auto';
 
     // Show loading
-    isLoading = true;
+    state.isLoading = true;
     sendBtn.disabled = true;
     sendBtn.textContent = '...';
     const loadingEl = addLoadingMessage();
@@ -28,7 +33,7 @@ async function sendMessage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 message,
-                history: conversationHistory.slice(-10)
+                history: state.conversationHistory.slice(-10)
             })
         });
 
@@ -37,7 +42,7 @@ async function sendMessage() {
 
         if (data.success && data.response) {
             addMessage('assistant', data.response);
-            conversationHistory.push({ role: 'assistant', content: data.response });
+            state.conversationHistory.push({ role: 'assistant', content: data.response });
         } else {
             addMessage('assistant', '⚠️ Sorry, something went wrong. Please try again.');
         }
@@ -46,14 +51,14 @@ async function sendMessage() {
         loadingEl.remove();
         addMessage('assistant', '⚠️ Connection error. Please check your internet and try again.');
     } finally {
-        isLoading = false;
+        state.isLoading = false;
         sendBtn.disabled = false;
         sendBtn.textContent = 'Send';
     }
 }
 
 // Generate content pack
-async function generateContentPack(business, topic) {
+export async function generateContentPack(business, topic) {
     const chatArea = document.getElementById('chatArea');
 
     // Show progress
@@ -132,10 +137,10 @@ async function generateContentPack(business, topic) {
 }
 
 // Regenerate image for platform
-async function regenerateImage(platform) {
-    const pack = window.generatedContent?.pack;
-    const biz = window.generatedContent?.biz || window.businessInfo;
-    const topic = window.selectedTopicTitle || 'professional service';
+export async function regenerateImage(platform) {
+    const pack = state.generatedContent?.pack;
+    const biz = state.generatedContent?.biz || state.businessInfo;
+    const topic = state.selectedTopicTitle || 'professional service';
 
     if (!pack || !biz) {
         showToast('❌ No content available - generate first');

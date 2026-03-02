@@ -3,10 +3,13 @@
  * Edit, Preview, and Publish modals
  */
 
+import { state, getConnectedAccounts, setConnectedAccount } from './state.js';
+import { platformNames } from './config.js';
+import { showToast, delay, getPlatformName, copyPlatformContent } from './utils.js';
+
 // ========== EDIT MODAL ==========
-function openEditModal(platform) {
-    const pack = window.generatedContent?.pack;
-    const biz = window.generatedContent?.biz || window.businessInfo;
+export function openEditModal(platform) {
+    const pack = state.generatedContent?.pack;
     if (!pack) {
         showToast('No content to edit');
         return;
@@ -32,32 +35,32 @@ function openEditModal(platform) {
                 <textarea id="editTextarea" style="width: 100%; height: 200px; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 14px; line-height: 1.6; resize: vertical;">${fullText}</textarea>
             </div>
             <div class="actions" style="display: flex; gap: 12px;">
-                <button onclick="closeEditModal()" style="flex: 1; padding: 12px; background: var(--bg); border: none; border-radius: 8px; cursor: pointer;">Cancel</button>
-                <button onclick="saveEdit('${platform}')" style="flex: 1; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">💾 Save Changes</button>
+                <button onclick="window.closeEditModal()" style="flex: 1; padding: 12px; background: var(--bg); border: none; border-radius: 8px; cursor: pointer;">Cancel</button>
+                <button onclick="window.saveEdit('${platform}')" style="flex: 1; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">💾 Save Changes</button>
             </div>
         </div>
     `;
     document.body.appendChild(modal);
 }
 
-function closeEditModal() {
+export function closeEditModal() {
     const modal = document.getElementById('editModal');
     if (modal) modal.remove();
 }
 
-function saveEdit(platform) {
+export function saveEdit(platform) {
     const newText = document.getElementById('editTextarea').value;
-    if (window.generatedContent?.pack?.platforms?.[platform]) {
-        window.generatedContent.pack.platforms[platform].content = newText;
+    if (state.generatedContent?.pack?.platforms?.[platform]) {
+        state.generatedContent.pack.platforms[platform].content = newText;
     }
     closeEditModal();
     showToast('✅ Changes saved!');
 }
 
 // ========== PREVIEW MODAL ==========
-function openPreviewModal(platform) {
-    const pack = window.generatedContent?.pack;
-    const biz = window.generatedContent?.biz || window.businessInfo;
+export function openPreviewModal(platform) {
+    const pack = state.generatedContent?.pack;
+    const biz = state.generatedContent?.biz || state.businessInfo;
     if (!pack || !biz) {
         showToast('No content to preview');
         return;
@@ -113,28 +116,28 @@ function openPreviewModal(platform) {
     modal.onclick = function(e) { if (e.target === modal) closePreviewModal(); };
     modal.innerHTML = `
         <div class="publish-dialog" style="max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative;">
-            <button onclick="closePreviewModal()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-secondary);">✕</button>
+            <button onclick="window.closePreviewModal()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-secondary);">✕</button>
             ${modalContent}
             <div class="actions" style="display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-                <button class="btn-cancel" onclick="closePreviewModal()" style="flex: 1; padding: 12px; background: var(--bg); border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">← Back</button>
-                <button onclick="copyPlatformContent('${platform}')" style="flex: 1; padding: 12px; background: white; border: 2px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer;">📋 Copy</button>
-                <button onclick="closePreviewModal(); openPublishModal('${platform}')" style="flex: 1; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">🚀 Publish</button>
+                <button class="btn-cancel" onclick="window.closePreviewModal()" style="flex: 1; padding: 12px; background: var(--bg); border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">← Back</button>
+                <button onclick="window.copyPlatformContent('${platform}')" style="flex: 1; padding: 12px; background: white; border: 2px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer;">📋 Copy</button>
+                <button onclick="window.closePreviewModal(); window.openPublishModal('${platform}')" style="flex: 1; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">🚀 Publish</button>
             </div>
         </div>
     `;
     document.body.appendChild(modal);
 }
 
-function closePreviewModal() {
+export function closePreviewModal() {
     const modal = document.getElementById('previewModal');
     if (modal) modal.remove();
 }
 
 // ========== PUBLISH MODAL ==========
-function openPublishModal(platform) {
-    currentPublishPlatform = platform;
+export function openPublishModal(platform) {
+    state.currentPublishPlatform = platform;
     const p = platformNames[platform] || { name: platform, icon: '📱' };
-    const pack = window.generatedContent?.pack;
+    const pack = state.generatedContent?.pack;
     const content = pack?.platforms?.[platform];
     const image = pack?.images?.[platform];
     const accounts = getConnectedAccounts();
@@ -167,71 +170,84 @@ function openPublishModal(platform) {
         `;
     }
 
-    document.getElementById('publishTitle').innerHTML = `${p.icon} Publish to ${p.name}`;
+    const titleEl = document.getElementById('publishTitle');
+    if (titleEl) titleEl.innerHTML = `${p.icon} Publish to ${p.name}`;
 
     const statusDiv = document.getElementById('publishStatus');
-    statusDiv.style.display = 'block';
-    statusDiv.innerHTML = `
-        <div style="background: white; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
-            <div style="font-weight: 600; margin-bottom: 12px;">📝 Content Preview</div>
-            ${previewHTML || '<p style="color: var(--text-secondary);">No content to preview</p>'}
-        </div>
+    if (statusDiv) {
+        statusDiv.style.display = 'block';
+        statusDiv.innerHTML = `
+            <div style="background: white; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                <div style="font-weight: 600; margin-bottom: 12px;">📝 Content Preview</div>
+                ${previewHTML || '<p style="color: var(--text-secondary);">No content to preview</p>'}
+            </div>
 
-        <div style="background: white; padding: 16px; border-radius: 12px;">
-            <div style="font-weight: 600; margin-bottom: 12px;">🔗 Account Status</div>
-            ${isConnected ? `
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), #FF8F6B); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">${p.icon}</div>
-                    <div style="flex: 1;">
-                        <div style="font-weight: 600;">${isConnected.name || p.name + ' Account'}</div>
-                        <div style="font-size: 13px; color: var(--success);">✓ Connected</div>
+            <div style="background: white; padding: 16px; border-radius: 12px;">
+                <div style="font-weight: 600; margin-bottom: 12px;">🔗 Account Status</div>
+                ${isConnected ? `
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), #FF8F6B); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">${p.icon}</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600;">${isConnected.name || p.name + ' Account'}</div>
+                            <div style="font-size: 13px; color: var(--success);">✓ Connected</div>
+                        </div>
+                        <button onclick="window.disconnectAccount('${platform}')" style="padding: 6px 12px; background: var(--bg); border: none; border-radius: 6px; font-size: 13px; cursor: pointer;">Disconnect</button>
                     </div>
-                    <button onclick="disconnectAccount('${platform}')" style="padding: 6px 12px; background: var(--bg); border: none; border-radius: 6px; font-size: 13px; cursor: pointer;">Disconnect</button>
-                </div>
-            ` : `
-                <div style="text-align: center; padding: 20px;">
-                    <div style="font-size: 32px; margin-bottom: 12px;">${p.icon}</div>
-                    <p style="color: var(--text-secondary); margin-bottom: 16px;">Connect your ${p.name} account to publish directly</p>
-                    <button onclick="connectAccount('${platform}')" style="padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                        🔗 Connect ${p.name}
-                    </button>
-                </div>
-            `}
-        </div>
-    `;
+                ` : `
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 32px; margin-bottom: 12px;">${p.icon}</div>
+                        <p style="color: var(--text-secondary); margin-bottom: 16px;">Connect your ${p.name} account to publish directly</p>
+                        <button onclick="window.connectAccount('${platform}')" style="padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            🔗 Connect ${p.name}
+                        </button>
+                    </div>
+                `}
+            </div>
+        `;
+    }
 
-    document.getElementById('publishResult').style.display = 'none';
+    const resultEl = document.getElementById('publishResult');
+    if (resultEl) resultEl.style.display = 'none';
+
     const confirmBtn = document.getElementById('publishConfirmBtn');
-    confirmBtn.style.display = isConnected ? 'block' : 'none';
-    confirmBtn.disabled = !isConnected;
-    confirmBtn.textContent = '🚀 Publish Now';
+    if (confirmBtn) {
+        confirmBtn.style.display = isConnected ? 'block' : 'none';
+        confirmBtn.disabled = !isConnected;
+        confirmBtn.textContent = '🚀 Publish Now';
+    }
 
-    document.getElementById('publishModal').classList.add('show');
+    const modalEl = document.getElementById('publishModal');
+    if (modalEl) modalEl.classList.add('show');
 }
 
-function closePublishModal() {
-    document.getElementById('publishModal').classList.remove('show');
-    currentPublishPlatform = null;
+export function closePublishModal() {
+    const modal = document.getElementById('publishModal');
+    if (modal) modal.classList.remove('show');
+    state.currentPublishPlatform = null;
 }
 
-function switchPublishTab(mode) {
-    publishMode = mode;
+export function switchPublishTab(mode) {
+    state.publishMode = mode;
     document.querySelectorAll('.option-tab').forEach(t => t.classList.remove('active'));
     event?.target?.classList.add('active');
 
-    document.getElementById('publishNowContent').style.display = mode === 'now' ? 'block' : 'none';
-    document.getElementById('scheduleContent').style.display = mode === 'schedule' ? 'block' : 'none';
+    const nowContent = document.getElementById('publishNowContent');
+    const scheduleContent = document.getElementById('scheduleContent');
+    if (nowContent) nowContent.style.display = mode === 'now' ? 'block' : 'none';
+    if (scheduleContent) scheduleContent.style.display = mode === 'schedule' ? 'block' : 'none';
 
     const btn = document.getElementById('publishConfirmBtn');
-    btn.textContent = mode === 'now' ? '🚀 Publish Now' : '📅 Schedule Post';
+    if (btn) btn.textContent = mode === 'now' ? '🚀 Publish Now' : '📅 Schedule Post';
 }
 
-async function confirmPublish() {
-    if (!currentPublishPlatform || !window.generatedContent) return;
+export async function confirmPublish() {
+    if (!state.currentPublishPlatform || !state.generatedContent) return;
 
     const confirmBtn = document.getElementById('publishConfirmBtn');
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Publishing...';
+    if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Publishing...';
+    }
 
     try {
         updatePublishStep(1, 'active');
@@ -246,32 +262,42 @@ async function confirmPublish() {
         await delay(1000);
         updatePublishStep(3, 'done');
 
-        document.getElementById('publishStatus').style.display = 'none';
+        const statusEl = document.getElementById('publishStatus');
+        if (statusEl) statusEl.style.display = 'none';
+
         const result = document.getElementById('publishResult');
-        result.className = 'publish-result success';
-        result.innerHTML = `
-            <div class="icon">✓</div>
-            <div class="message">Published successfully to ${platformNames[currentPublishPlatform]?.name || currentPublishPlatform}!</div>
-            <p style="margin-top:10px; font-size:14px; color:var(--text-secondary);">Your post is now live.</p>
-        `;
-        result.style.display = 'block';
-        confirmBtn.style.display = 'none';
+        if (result) {
+            result.className = 'publish-result success';
+            result.innerHTML = `
+                <div class="icon">✓</div>
+                <div class="message">Published successfully to ${platformNames[state.currentPublishPlatform]?.name || state.currentPublishPlatform}!</div>
+                <p style="margin-top:10px; font-size:14px; color:var(--text-secondary);">Your post is now live.</p>
+            `;
+            result.style.display = 'block';
+        }
+        if (confirmBtn) confirmBtn.style.display = 'none';
 
     } catch (error) {
         console.error('Publish error:', error);
         updatePublishStep(3, 'error');
 
-        document.getElementById('publishStatus').style.display = 'none';
+        const statusEl = document.getElementById('publishStatus');
+        if (statusEl) statusEl.style.display = 'none';
+
         const result = document.getElementById('publishResult');
-        result.className = 'publish-result error';
-        result.innerHTML = `
-            <div class="icon">✕</div>
-            <div class="message">Failed to publish</div>
-            <p style="margin-top:10px; font-size:14px;">${error.message}</p>
-        `;
-        result.style.display = 'block';
-        confirmBtn.textContent = 'Try Again';
-        confirmBtn.disabled = false;
+        if (result) {
+            result.className = 'publish-result error';
+            result.innerHTML = `
+                <div class="icon">✕</div>
+                <div class="message">Failed to publish</div>
+                <p style="margin-top:10px; font-size:14px;">${error.message}</p>
+            `;
+            result.style.display = 'block';
+        }
+        if (confirmBtn) {
+            confirmBtn.textContent = 'Try Again';
+            confirmBtn.disabled = false;
+        }
     }
 }
 
@@ -280,14 +306,16 @@ function updatePublishStep(stepNum, status) {
     if (!step) return;
     step.className = `step ${status}`;
     const icon = step.querySelector('.step-icon');
-    if (status === 'done') icon.textContent = '✓';
-    else if (status === 'error') icon.textContent = '✕';
-    else if (status === 'active') icon.textContent = stepNum;
+    if (icon) {
+        if (status === 'done') icon.textContent = '✓';
+        else if (status === 'error') icon.textContent = '✕';
+        else if (status === 'active') icon.textContent = stepNum;
+    }
 }
 
-function connectAccount(platform) {
+export function connectAccount(platform) {
     const p = platformNames[platform];
-    const mockName = window.businessInfo?.name || 'My Business';
+    const mockName = state.businessInfo?.name || 'My Business';
 
     setTimeout(() => {
         setConnectedAccount(platform, {
@@ -299,7 +327,7 @@ function connectAccount(platform) {
     }, 500);
 }
 
-function disconnectAccount(platform) {
+export function disconnectAccount(platform) {
     const accounts = getConnectedAccounts();
     delete accounts[platform];
     localStorage.setItem('marketingclaw_accounts', JSON.stringify(accounts));
@@ -307,15 +335,28 @@ function disconnectAccount(platform) {
     openPublishModal(platform);
 }
 
-function quickPublish(platform) {
+export function quickPublish(platform) {
     openPublishModal(platform);
 }
 
-function publishFromModal(platform) {
-    closePreviewModal();
-    openPublishModal(platform);
-}
-
-function publishAll() {
+export function publishAll() {
     showToast('Publishing to all platforms...');
+}
+
+// Export functions to window for HTML onclick handlers
+if (typeof window !== 'undefined') {
+    window.openEditModal = openEditModal;
+    window.closeEditModal = closeEditModal;
+    window.saveEdit = saveEdit;
+    window.openPreviewModal = openPreviewModal;
+    window.closePreviewModal = closePreviewModal;
+    window.openPublishModal = openPublishModal;
+    window.closePublishModal = closePublishModal;
+    window.switchPublishTab = switchPublishTab;
+    window.confirmPublish = confirmPublish;
+    window.connectAccount = connectAccount;
+    window.disconnectAccount = disconnectAccount;
+    window.quickPublish = quickPublish;
+    window.publishAll = publishAll;
+    window.copyPlatformContent = copyPlatformContent;
 }

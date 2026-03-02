@@ -1,7 +1,17 @@
 /**
  * MarketingClaw - Main Entry Point
- * Initialization and event bindings
+ * ES Modules Architecture - v3.0
  */
+
+// Import all modules
+import { state } from './state.js';
+import { availableAgents } from './config.js';
+import { updateAgentCount, renderAgentSelector, renderActiveAgents, syncHiredAgents, checkMention, hideMentionPopup } from './agents.js';
+import { processConversation, addChatBubble } from './chat-ui.js';
+import { sendMessage, generateContentPack, regenerateImage } from './api-client.js';
+import './modals.js';  // Auto-registers window functions
+import './preview-renders.js';  // Auto-registers window functions
+import './utils.js';  // Auto-registers window functions
 
 // Initialize app
 function init() {
@@ -57,13 +67,17 @@ function init() {
         }
     });
 
-    console.log('MarketingClaw initialized');
+    console.log('MarketingClaw initialized (ES Modules)');
 }
 
-// Start on DOM ready
-document.addEventListener('DOMContentLoaded', init);
+// Export to window for API calls from other modules
+window.sendMessage = sendMessage;
+window.generateContentPack = generateContentPack;
+window.regenerateImage = regenerateImage;
 
-// Also call init if already loaded
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
+// Start on DOM ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
     init();
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v3.0 - Refactored: CSS and JS extracted to separate files -->
+<!-- v3.1 - ES Modules Architecture -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -210,15 +210,7 @@
         </div>
     </div>
 
-    <!-- Load JS modules (order matters!) -->
-    <script src="../assets/js/config.js"></script>
-    <script src="../assets/js/state.js"></script>
-    <script src="../assets/js/utils.js"></script>
-    <script src="../assets/js/agents.js"></script>
-    <script src="../assets/js/api-client.js"></script>
-    <script src="../assets/js/preview-renders.js"></script>
-    <script src="../assets/js/modals.js"></script>
-    <script src="../assets/js/chat-ui.js"></script>
-    <script src="../assets/js/main.js"></script>
+    <!-- ES Modules - Single Entry Point -->
+    <script type="module" src="../assets/js/main.js"></script>
 </body>
 </html>

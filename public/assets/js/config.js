@@ -4,7 +4,7 @@
  */
 
 // Available agents - synced with marketplace
-const availableAgents = [
+export const availableAgents = [
     // Local Intel
     { id: 'localtrend', name: 'Trend Radar', icon: '📍' },
     { id: 'competitor', name: 'Competitor Intel', icon: '🕵️' },
@@ -33,7 +33,7 @@ const availableAgents = [
 ];
 
 // Reliable fallback images - used when pack images are missing
-const fallbackImages = {
+export const fallbackImages = {
     plumber: 'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=800',
     electrician: 'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=800',
     hvac: 'https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&w=800',
@@ -44,7 +44,7 @@ const fallbackImages = {
 };
 
 // Topic-based fallback images
-const topicFallbackImages = {
+export const topicFallbackImages = {
     spring: 'https://images.pexels.com/photos/5691622/pexels-photo-5691622.jpeg?auto=compress&w=800',
     emergency: 'https://images.pexels.com/photos/8005368/pexels-photo-8005368.jpeg?auto=compress&w=800',
     discount: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&w=800',
@@ -55,7 +55,7 @@ const topicFallbackImages = {
 };
 
 // Platform names and icons
-const platformNames = {
+export const platformNames = {
     google: { name: 'Google Business', icon: '📍' },
     nextdoor: { name: 'Nextdoor', icon: '🏘️' },
     facebook: { name: 'Facebook', icon: '📘' },
@@ -65,14 +65,14 @@ const platformNames = {
 };
 
 // Platform-specific image styles for regeneration
-const platformImageStyles = {
+export const platformImageStyles = {
     google: 'professional business photo, clean background, trust and reliability, Google Business Profile style',
     facebook: 'engaging social media photo, warm and friendly, lifestyle feel, Facebook post style, square format',
     nextdoor: 'neighborly community photo, local business feel, approachable, outdoor residential setting'
 };
 
 // Topics by trade
-const topicsByTrade = {
+export const topicsByTrade = {
     plumber: [
         { icon: '🌧️', title: 'Spring Plumbing Inspection', reason: 'Spring rain season starting - sump pump & drain checks trending. Search volume up 180%', heat: '🔥🔥🔥 Very High' },
         { icon: '🌱', title: 'Outdoor Faucet & Sprinkler Startup', reason: 'Homeowners preparing yards for spring. Irrigation system repairs in demand', heat: '🔥🔥 High' },
@@ -96,7 +96,7 @@ const topicsByTrade = {
 };
 
 // Quick prompts for demo
-const quickPrompts = {
+export const quickPrompts = {
     start: "Hi! I want to create marketing content for my home service business. Help me get started.",
     plumber: "I'm a plumber. My business is called 'Quick Fix Plumbing', located in Austin, TX (78704). I want to get more local leads. What platforms should I focus on and can you create content for me?",
     electrician: "I'm an electrician. My business is 'Spark Electric Services' in Phoenix, AZ (85001). I specialize in panel upgrades and EV charger installations. Help me create marketing content.",

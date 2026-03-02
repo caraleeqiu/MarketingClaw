@@ -3,35 +3,35 @@
  * Manages application state and localStorage
  */
 
-// State variables
-let addedAgents = JSON.parse(localStorage.getItem('addedAgentsHomePro') || '[]');
-let messages = [];
-let hiredAgents = [];
-let conversationHistory = [];
-let isLoading = false;
-let currentPublishPlatform = null;
-let publishMode = 'now';
-let selectedTrade = 'plumber';
-let selectedTopic = 0;
-
-// Window-level state (for cross-module access)
-window.businessInfo = null;
-window.generatedContent = null;
-window.selectedTopicTitle = null;
+// Reactive state object
+export const state = {
+    addedAgents: JSON.parse(localStorage.getItem('addedAgentsHomePro') || '[]'),
+    messages: [],
+    hiredAgents: [],
+    conversationHistory: [],
+    isLoading: false,
+    currentPublishPlatform: null,
+    publishMode: 'now',
+    selectedTrade: 'plumber',
+    selectedTopic: 0,
+    businessInfo: null,
+    generatedContent: null,
+    selectedTopicTitle: null
+};
 
 // Connected accounts (localStorage)
-function getConnectedAccounts() {
+export function getConnectedAccounts() {
     return JSON.parse(localStorage.getItem('marketingclaw_accounts') || '{}');
 }
 
-function setConnectedAccount(platform, data) {
+export function setConnectedAccount(platform, data) {
     const accounts = getConnectedAccounts();
     accounts[platform] = data;
     localStorage.setItem('marketingclaw_accounts', JSON.stringify(accounts));
 }
 
 // History management
-function saveToHistory(pack, biz, topic) {
+export function saveToHistory(pack, biz, topic) {
     try {
         const history = JSON.parse(localStorage.getItem('marketingclaw_history') || '[]');
         const today = new Date().toISOString().split('T')[0];
@@ -75,6 +75,11 @@ function saveToHistory(pack, biz, topic) {
     }
 }
 
-function getHistory() {
+export function getHistory() {
     return JSON.parse(localStorage.getItem('marketingclaw_history') || '[]');
+}
+
+// Save added agents to localStorage
+export function saveAddedAgents() {
+    localStorage.setItem('addedAgentsHomePro', JSON.stringify(state.addedAgents));
 }

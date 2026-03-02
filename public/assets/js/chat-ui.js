@@ -3,8 +3,13 @@
  * Message display, conversation flow, and chat interactions
  */
 
+import { state, getHistory, saveToHistory } from './state.js';
+import { quickPrompts, topicsByTrade } from './config.js';
+import { formatMarkdown, capitalize, getTradeIcon, getTopicsForTrade, delay, getSelectedPlatforms } from './utils.js';
+import { renderGooglePreview, renderFacebookPreview, renderNextdoorPreview, renderInstagramPreview, generateGoogleBusinessContent } from './preview-renders.js';
+
 // Add loading message
-function addLoadingMessage() {
+export function addLoadingMessage() {
     const chatArea = document.getElementById('chatArea');
     const loadingEl = document.createElement('div');
     loadingEl.className = 'message assistant';
@@ -21,7 +26,7 @@ function addLoadingMessage() {
 }
 
 // Add message to chat
-function addMessage(role, content) {
+export function addMessage(role, content) {
     const chatArea = document.getElementById('chatArea');
 
     const welcome = chatArea.querySelector('.welcome');
@@ -42,7 +47,7 @@ function addMessage(role, content) {
 }
 
 // Add chat bubble (for conversation flow)
-function addChatBubble(role, content, extras = '') {
+export function addChatBubble(role, content, extras = '') {
     const chatArea = document.getElementById('chatArea');
 
     const welcome = chatArea.querySelector('.welcome');
@@ -65,8 +70,7 @@ function addChatBubble(role, content, extras = '') {
 }
 
 // Process conversation for business info extraction
-async function processConversation(message) {
-    const chatArea = document.getElementById('chatArea');
+export async function processConversation(message) {
     const lowerMsg = message.toLowerCase();
 
     // Check for greetings
@@ -77,10 +81,10 @@ async function processConversation(message) {
             What kind of work do you do?
         `, `
             <div class="quick-replies">
-                <button class="quick-reply" onclick="selectTradeFromChat('plumber')">🔧 Plumber</button>
-                <button class="quick-reply" onclick="selectTradeFromChat('electrician')">⚡ Electrician</button>
-                <button class="quick-reply" onclick="selectTradeFromChat('hvac')">❄️ HVAC</button>
-                <button class="quick-reply" onclick="selectTradeFromChat('roofer')">🏠 Roofer</button>
+                <button class="quick-reply" onclick="window.selectTradeFromChat('plumber')">🔧 Plumber</button>
+                <button class="quick-reply" onclick="window.selectTradeFromChat('electrician')">⚡ Electrician</button>
+                <button class="quick-reply" onclick="window.selectTradeFromChat('hvac')">❄️ HVAC</button>
+                <button class="quick-reply" onclick="window.selectTradeFromChat('roofer')">🏠 Roofer</button>
             </div>
         `);
         return;
@@ -103,7 +107,7 @@ async function processConversation(message) {
     }
 
     if (detectedTrade) {
-        selectedTrade = detectedTrade;
+        state.selectedTrade = detectedTrade;
 
         // Try to extract business info
         const nameMatch = message.match(/(?:called|named|is|business)\s+['"]?([A-Z][A-Za-z'\s]+)['"]?/i) ||
@@ -115,18 +119,18 @@ async function processConversation(message) {
         const phoneMatch = message.match(/(\d{3}[-.\s]?\d{3}[-.\s]?\d{4})/);
 
         if (nameMatch && locationMatch) {
-            window.businessInfo = {
+            state.businessInfo = {
                 name: nameMatch[1].trim(),
-                trade: selectedTrade,
+                trade: state.selectedTrade,
                 location: locationMatch[1].trim(),
                 phone: phoneMatch ? phoneMatch[1] : '(555) 123-4567'
             };
 
             addChatBubble('assistant', `
                 <strong>Got it! 📝</strong><br><br>
-                <strong>${window.businessInfo.name}</strong><br>
-                📍 ${window.businessInfo.location}<br>
-                🔧 ${capitalize(selectedTrade)}<br><br>
+                <strong>${state.businessInfo.name}</strong><br>
+                📍 ${state.businessInfo.location}<br>
+                🔧 ${capitalize(state.selectedTrade)}<br><br>
                 Let me find trending topics for your area...
             `);
 
@@ -141,13 +145,13 @@ async function processConversation(message) {
         }
     } else {
         // Generic response - call API
-        await sendMessage();
+        await window.sendMessage();
     }
 }
 
 // Select trade from chat
-function selectTradeFromChat(trade) {
-    selectedTrade = trade;
+export function selectTradeFromChat(trade) {
+    state.selectedTrade = trade;
     addChatBubble('user', `I'm a ${capitalize(trade)}`);
 
     setTimeout(() => {
@@ -160,35 +164,35 @@ function selectTradeFromChat(trade) {
 }
 
 // Show topic recommendations in chat
-async function showTopicRecommendationsChat() {
-    const topics = getTopicsForTrade(selectedTrade);
+export async function showTopicRecommendationsChat() {
+    const topics = getTopicsForTrade(state.selectedTrade);
 
     addChatBubble('assistant', `
-        <strong>📊 Hot Topics for ${capitalize(selectedTrade)}s This Week:</strong>
+        <strong>📊 Hot Topics for ${capitalize(state.selectedTrade)}s This Week:</strong>
         ${topics.map((t, i) => `
-            <div style="background: ${i === 0 ? 'var(--primary-light)' : 'white'}; padding: 12px 16px; border-radius: 10px; margin: 8px 0; cursor: pointer; border: 1px solid var(--border);" onclick="selectTopicFromChat('${t.title}')">
+            <div style="background: ${i === 0 ? 'var(--primary-light)' : 'white'}; padding: 12px 16px; border-radius: 10px; margin: 8px 0; cursor: pointer; border: 1px solid var(--border);" onclick="window.selectTopicFromChat('${t.title}')">
                 <div style="font-weight: 600;">${t.icon} ${t.title} ${i === 0 ? '⭐ Recommended' : ''}</div>
                 <div style="font-size: 13px; color: var(--text-secondary);">${t.reason}</div>
             </div>
         `).join('')}
     `, `
         <div class="quick-replies">
-            <button class="quick-reply" onclick="selectTopicFromChat('${topics[0].title}')">✨ Use recommended</button>
-            <button class="quick-reply" onclick="showMoreTopics()">📊 More options</button>
+            <button class="quick-reply" onclick="window.selectTopicFromChat('${topics[0].title}')">✨ Use recommended</button>
+            <button class="quick-reply" onclick="window.showMoreTopics()">📊 More options</button>
         </div>
     `);
 }
 
 // Show more topics
-function showMoreTopics() {
+export function showMoreTopics() {
     addChatBubble('user', 'Show other topics');
-    const topics = getTopicsForTrade(selectedTrade);
+    const topics = getTopicsForTrade(state.selectedTrade);
 
     setTimeout(() => {
         addChatBubble('assistant', `
             <strong>📊 All recommended topics:</strong>
             ${topics.map((t, i) => `
-                <div style="background: ${i === 0 ? 'var(--primary-light)' : 'white'}; padding: 12px 16px; border-radius: 10px; margin: 8px 0; cursor: pointer; border: 1px solid var(--border);" onclick="selectTopicFromChat('${t.title}')">
+                <div style="background: ${i === 0 ? 'var(--primary-light)' : 'white'}; padding: 12px 16px; border-radius: 10px; margin: 8px 0; cursor: pointer; border: 1px solid var(--border);" onclick="window.selectTopicFromChat('${t.title}')">
                     <div style="font-weight: 600;">${t.icon} ${t.title} ${i === 0 ? '⭐' : ''}</div>
                     <div style="font-size: 13px; color: var(--text-secondary);">${t.reason}</div>
                 </div>
@@ -198,20 +202,20 @@ function showMoreTopics() {
 }
 
 // Select topic from chat
-function selectTopicFromChat(topic) {
-    window.selectedTopicTitle = topic;
+export function selectTopicFromChat(topic) {
+    state.selectedTopicTitle = topic;
     addChatBubble('user', `Selected: ${topic}`);
     setTimeout(() => {
         addChatBubble('assistant', `Great choice! Ready to generate content about "${topic}"?`, `
             <div class="quick-replies">
-                <button class="quick-reply" onclick="generateAllContent()">✨ Generate content</button>
+                <button class="quick-reply" onclick="window.generateAllContent()">✨ Generate content</button>
             </div>
         `);
     }, 300);
 }
 
 // Generate all content
-async function generateAllContent() {
+export async function generateAllContent() {
     addChatBubble('user', 'Generate content');
 
     await delay(300);
@@ -225,43 +229,43 @@ async function generateAllContent() {
         </div>
     `);
 
-    const biz = window.businessInfo;
-    const topic = window.selectedTopicTitle;
+    const biz = state.businessInfo;
+    const topic = state.selectedTopicTitle;
 
-    await generateContentPack(biz, topic);
+    await window.generateContentPack(biz, topic);
 }
 
 // Use example message
-function useExample(el) {
+export function useExample(el) {
     const text = el.textContent.replace(/"/g, '');
     document.getElementById('messageInput').value = text;
     document.getElementById('messageInput').focus();
 }
 
 // Quick prompt
-function quickPrompt(type) {
+export function quickPrompt(type) {
     const prompt = quickPrompts[type] || '';
     document.getElementById('messageInput').value = prompt;
     document.getElementById('messageInput').focus();
 }
 
 // Quick generate
-function quickGenerate() {
+export function quickGenerate() {
     const welcome = document.querySelector('.welcome');
     if (welcome) welcome.remove();
 
-    const biz = window.businessInfo;
+    const biz = state.businessInfo;
     if (!biz || !biz.name) {
         addChatBubble('assistant', '⚠️ Please tell me about your business first.');
         return;
     }
 
-    const topic = window.selectedTopicTitle || 'Spring maintenance tips';
-    generateContentPack(biz, topic);
+    const topic = state.selectedTopicTitle || 'Spring maintenance tips';
+    window.generateContentPack(biz, topic);
 }
 
 // Show history
-function showHistory() {
+export function showHistory() {
     const chatArea = document.getElementById('chatArea');
     const history = getHistory();
 
@@ -293,7 +297,7 @@ function showHistory() {
 }
 
 // Show auto publish
-function showAutoPublish() {
+export function showAutoPublish() {
     addChatBubble('assistant', `
         <strong>🚀 Auto Publish</strong><br><br>
         Set up automatic posting schedules to keep your social media active.<br><br>
@@ -302,26 +306,60 @@ function showAutoPublish() {
 }
 
 // Select trade
-function selectTrade(trade) {
-    selectedTrade = trade;
+export function selectTrade(trade) {
+    state.selectedTrade = trade;
     document.querySelectorAll('.trade-btn').forEach(btn => {
         btn.classList.toggle('selected', btn.dataset.trade === trade);
     });
 }
 
-// Show result tab
-function showResultTab(tabName) {
-    const parent = event.target.closest('.platform-content') || document;
-    parent.querySelectorAll('.result-tab').forEach(t => t.classList.remove('active'));
-    parent.querySelectorAll('.result-section').forEach(s => s.classList.remove('active'));
-    event.target.classList.add('active');
-    document.getElementById(`section-${tabName}`)?.classList.add('active');
+// Display content pack
+export function displayContentPack(pack) {
+    const chatArea = document.getElementById('chatArea');
+    const biz = state.businessInfo;
+
+    const gbpContent = generateGoogleBusinessContent(biz, pack);
+    const selectedPlatforms = getSelectedPlatforms();
+
+    state.generatedContent = { pack, gbp: gbpContent, biz };
+    saveToHistory(pack, biz, state.selectedTopicTitle || 'Marketing Content');
+
+    chatArea.innerHTML = `
+        <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h2 style="margin-bottom: 4px;">✅ Content Ready</h2>
+                    <p style="color: var(--text-secondary);">${biz.name} • ${state.selectedTopicTitle || 'Marketing Content'}</p>
+                </div>
+                <button class="generate-pack-btn" onclick="window.publishAll()" style="margin: 0;">
+                    🚀 Publish All
+                </button>
+            </div>
+
+            <p style="margin-bottom: 16px; color: var(--text-secondary);">Click any card to preview, edit, or publish</p>
+
+            <div class="preview-grid">
+                ${selectedPlatforms.includes('google') ? renderGooglePreview(pack, biz) : ''}
+                ${selectedPlatforms.includes('facebook') ? renderFacebookPreview(pack, biz) : ''}
+                ${selectedPlatforms.includes('nextdoor') ? renderNextdoorPreview(pack, biz) : ''}
+                ${selectedPlatforms.includes('instagram') ? renderInstagramPreview(pack, biz) : ''}
+            </div>
+        </div>
+    `;
+
+    chatArea.scrollTop = 0;
 }
 
-// Show platform tab
-function showPlatformTab(platform) {
-    document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.platform-content').forEach(c => c.classList.remove('active'));
-    event.target.closest('.platform-tab')?.classList.add('active');
-    document.getElementById(`platform-${platform}`)?.classList.add('active');
+// Export functions to window for HTML onclick handlers
+if (typeof window !== 'undefined') {
+    window.selectTradeFromChat = selectTradeFromChat;
+    window.selectTopicFromChat = selectTopicFromChat;
+    window.showMoreTopics = showMoreTopics;
+    window.generateAllContent = generateAllContent;
+    window.useExample = useExample;
+    window.quickPrompt = quickPrompt;
+    window.quickGenerate = quickGenerate;
+    window.showHistory = showHistory;
+    window.showAutoPublish = showAutoPublish;
+    window.selectTrade = selectTrade;
 }
