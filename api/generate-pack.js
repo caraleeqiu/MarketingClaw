@@ -1,10 +1,12 @@
 // Vercel Serverless Function - Generate Marketing Content Pack
 // Returns structured JSON with content for each platform + image prompts
-// v2.1 - Topic-based image matching
+// v2.2 - Upgraded to Gemini 3.1 Flash Image for image generation
 
 export const config = {
   runtime: 'edge',
 };
+
+const IMAGE_MODEL = 'gemini-3.1-flash-image-preview';
 
 const SYSTEM_PROMPT = `You are MarketingClaw. Generate marketing content for home service professionals.
 
@@ -194,45 +196,52 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
     console.log('AI returned images:', contentPack.images);
     contentPack.images = {};
 
-    // Generate image with Google Business aspect ratio (4:3) as primary
+    // Generate image with Gemini 3.1 Flash Image
     // Frontend will display same image but styled for each platform
-    console.log('Generating AI image...');
+    console.log('Generating AI image with Gemini 3.1 Flash Image...');
     console.log('Trade:', trade, 'Topic:', topic);
     console.log('Image prompt:', imagePrompt);
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${IMAGE_MODEL}:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            instances: [{ prompt: imagePrompt }],
-            parameters: {
-              sampleCount: 1,
-              aspectRatio: '4:3',
-              personGeneration: 'allow_adult'
+            contents: [{
+              parts: [{ text: imagePrompt }]
+            }],
+            generationConfig: {
+              responseModalities: ['IMAGE'],
+              imageConfig: {
+                aspectRatio: '4:3',
+                imageSize: '1K'
+              }
             }
           }),
         }
       );
       if (response.ok) {
         const data = await response.json();
-        const base64 = data.predictions?.[0]?.bytesBase64Encoded;
+        const parts = data.candidates?.[0]?.content?.parts || [];
+        const imagePart = parts.find(p => p.inlineData);
+        const base64 = imagePart?.inlineData?.data;
+        const mimeType = imagePart?.inlineData?.mimeType || 'image/png';
         if (base64) {
-          const imageUrl = `data:image/png;base64,${base64}`;
+          const imageUrl = `data:${mimeType};base64,${base64}`;
           contentPack.images.google = imageUrl;
           contentPack.images.nextdoor = imageUrl;
           contentPack.images.facebook = imageUrl;
-          console.log('Imagen SUCCESS');
+          console.log('Gemini 3.1 Flash Image SUCCESS');
         }
       } else {
-        console.error('Imagen error:', await response.text());
+        console.error('Gemini Image error:', await response.text());
       }
     } catch (e) {
       console.error('Image generation error:', e);
     }
 
-    console.log('Image generated:', !!contentPack.images.google);
+    console.log('Image generated with', IMAGE_MODEL + ':', !!contentPack.images.google);
 
     // Fallback - use Topic + Trade based image selection
     if (!contentPack.images.google) {

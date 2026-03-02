@@ -1,7 +1,9 @@
-// Vercel Serverless Function - Generate Marketing Images using Imagen API
+// Vercel Serverless Function - Generate Marketing Images using Gemini 3.1 Flash Image
 export const config = {
   runtime: 'edge',
 };
+
+const IMAGE_MODEL = 'gemini-3.1-flash-image-preview';
 
 export default async function handler(req) {
   const headers = {
@@ -47,18 +49,22 @@ export default async function handler(req) {
 
     const aspectRatio = aspectRatios[platform] || aspectRatios.default;
 
-    // Call Imagen API
+    // Call Gemini 3.1 Flash Image API
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${IMAGE_MODEL}:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          instances: [{ prompt }],
-          parameters: {
-            sampleCount: 1,
-            aspectRatio: aspectRatio,
-            personGeneration: 'allow_adult'  // Allow professional workers in marketing photos
+          contents: [{
+            parts: [{ text: prompt }]
+          }],
+          generationConfig: {
+            responseModalities: ['IMAGE'],
+            imageConfig: {
+              aspectRatio: aspectRatio,
+              imageSize: '1K'
+            }
           }
         }),
       }
@@ -66,7 +72,7 @@ export default async function handler(req) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Imagen API error:', errorText);
+      console.error('Gemini Image API error:', errorText);
       return new Response(JSON.stringify({
         error: 'Image generation failed',
         details: errorText
@@ -77,8 +83,11 @@ export default async function handler(req) {
 
     const data = await response.json();
 
-    // Imagen returns base64 encoded images
-    const imageData = data.predictions?.[0]?.bytesBase64Encoded;
+    // Gemini returns inlineData with base64 encoded images
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const imagePart = parts.find(p => p.inlineData);
+    const imageData = imagePart?.inlineData?.data;
+    const mimeType = imagePart?.inlineData?.mimeType || 'image/png';
 
     if (!imageData) {
       return new Response(JSON.stringify({
@@ -91,9 +100,10 @@ export default async function handler(req) {
 
     return new Response(JSON.stringify({
       success: true,
-      image: `data:image/png;base64,${imageData}`,
+      image: `data:${mimeType};base64,${imageData}`,
       aspectRatio: aspectRatio,
-      platform: platform
+      platform: platform,
+      model: IMAGE_MODEL
     }), {
       status: 200, headers,
     });
