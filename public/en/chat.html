@@ -1501,6 +1501,8 @@
             width: 100%;
             aspect-ratio: 16/9;
             object-fit: cover;
+            display: block;
+            background: #f5f5f5;
         }
         .nd-content {
             padding: 16px;
@@ -2594,7 +2596,7 @@
                             <div class="nd-location">📍 ${biz.location}</div>
                         </div>
                     </div>
-                    <img class="nd-image" src="${image}" alt="Post image" style="aspect-ratio: 16/9;" onerror="this.src='${fallbackImages[trade] || fallbackImages.default}'">
+                    <img class="nd-image" src="${image}" alt="Post image" style="aspect-ratio: 16/9; object-fit: cover; width: 100%;" onerror="this.src='${fallbackImages[trade] || fallbackImages.default}'">
                     <div class="nd-content" style="white-space: pre-line;">${text}</div>
                     <div class="preview-actions">
                         <button style="background: #fff3e0;" onclick="event.stopPropagation(); regenerateImage('nextdoor')">🔄 换图</button>
