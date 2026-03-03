@@ -109,12 +109,13 @@ export async function processConversation(message) {
     if (detectedTrade) {
         state.selectedTrade = detectedTrade;
 
-        // Try to extract business info
-        const nameMatch = message.match(/(?:called|named|is|business)\s+['"]?([A-Z][A-Za-z'\s]+)['"]?/i) ||
+        // Try to extract business info - multiple patterns
+        const nameMatch = message.match(/from\s+([A-Z][A-Za-z'\s]+'s\s+(?:Plumbing|Electric|HVAC|Roofing|Landscaping))/i) ||
+                          message.match(/(?:called|named|business)\s+['"]?([A-Z][A-Za-z'\s]+(?:Plumbing|Electric|HVAC|Roofing))['"]?/i) ||
                           message.match(/['"]([A-Z][A-Za-z'\s]+(?:Plumbing|Electric|HVAC|Roofing|Services?))['"]?/i);
 
-        const locationMatch = message.match(/in\s+([A-Za-z\s]+,?\s*[A-Z]{2})/i) ||
-                              message.match(/([A-Za-z\s]+,\s*[A-Z]{2}\s*\d{5})/i);
+        const locationMatch = message.match(/in\s+([A-Za-z\s]+,?\s*[A-Z]{2}\s*\d{5})/i) ||
+                              message.match(/in\s+([A-Za-z\s]+,?\s*[A-Z]{2})/i);
 
         const phoneMatch = message.match(/(\d{3}[-.\s]?\d{3}[-.\s]?\d{4})/);
 
