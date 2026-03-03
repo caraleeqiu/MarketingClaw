@@ -47,290 +47,233 @@ function showTradeSelection() {
     `);
 }
 
-// Show referral flow
+// Show referral flow - CONVERSATION STYLE
 export function showReferralFlow() {
-    const chatArea = document.getElementById('chatArea');
+    // Start conversation flow
+    addChatBubble('assistant', `
+        <strong>📱 Share & Get Reviews</strong><br><br>
+        Let's turn your completed work into 5-star reviews!<br><br>
+        First, what's your customer's name?
+    `);
 
-    // Check if we have business info
-    const hasBizInfo = state.businessInfo && state.businessInfo.name;
+    // Set flow state
+    referralState.flowStep = 'customer_name';
+}
 
-    const html = `
-        <div class="referral-flow" id="referralFlow">
-            <div class="referral-header">
-                <span class="referral-icon">📱</span>
-                <h2>Share & Get Reviews</h2>
-                <p>Turn your completed work into 5-star reviews and new referrals</p>
+// Process referral conversation input
+export async function processReferralInput(message) {
+    const step = referralState.flowStep;
+
+    if (step === 'customer_name') {
+        referralState.customerName = message;
+        addChatBubble('user', message);
+        await delay(300);
+        addChatBubble('assistant', `
+            <strong>Great!</strong> And what's ${message}'s phone number?<br>
+            <span style="color: var(--text-secondary); font-size: 13px;">(For WhatsApp - e.g., +1 512-555-0000)</span>
+        `);
+        referralState.flowStep = 'customer_phone';
+    }
+    else if (step === 'customer_phone') {
+        referralState.customerPhone = message;
+        addChatBubble('user', message);
+        await delay(300);
+        addChatBubble('assistant', `
+            <strong>Perfect!</strong> Now let's add your work photos.<br><br>
+            What type of photos do you have?
+        `, `
+            <div class="quick-replies">
+                <button class="quick-reply" onclick="window.selectPhotoType('after')">📷 Just the completed work</button>
+                <button class="quick-reply" onclick="window.selectPhotoType('beforeafter')">📸 Before & After</button>
             </div>
+        `);
+        referralState.flowStep = 'photo_type';
+    }
+    else if (step === 'job_description') {
+        referralState.jobDescription = message;
+        addChatBubble('user', message);
+        await delay(300);
+        await generateReferralFromConversation();
+    }
+}
 
-            <!-- Step 1: Business & Customer Info -->
-            <div class="referral-step" id="referralStep1">
-                <div class="step-badge">Step 1</div>
-                <h3>Customer Information</h3>
+// Select photo type
+export function selectPhotoType(type) {
+    referralState.hasBeforeAfter = (type === 'beforeafter');
+    addChatBubble('user', type === 'beforeafter' ? 'Before & After photos' : 'Just the completed work');
 
-                ${hasBizInfo ? `
-                    <div class="biz-info-card">
-                        <div class="biz-info-header">
-                            <span>Your Business</span>
-                            <button onclick="window.editBizInfo()" class="edit-btn">✏️ Edit</button>
-                        </div>
-                        <div class="biz-info-content">
-                            <strong>${state.businessInfo.name}</strong><br>
-                            📍 ${state.businessInfo.location || 'Location not set'}
-                        </div>
-                    </div>
-                ` : `
-                    <div class="form-group">
-                        <label>Your Business Name</label>
-                        <input type="text" id="refBizName" placeholder="e.g. Mike's Plumbing" class="ref-input">
-                    </div>
-                    <div class="form-group">
-                        <label>Your Location</label>
-                        <input type="text" id="refBizLocation" placeholder="e.g. Austin, TX" class="ref-input">
-                    </div>
-                `}
+    setTimeout(() => {
+        if (type === 'beforeafter') {
+            showBeforeAfterUpload();
+        } else {
+            showSinglePhotoUpload();
+        }
+    }, 300);
+}
 
-                <div class="form-group">
-                    <label>Customer's Name</label>
-                    <input type="text" id="customerName" placeholder="e.g. John" class="ref-input">
+// Show single photo upload in chat
+function showSinglePhotoUpload() {
+    addChatBubble('assistant', `
+        <strong>📷 Upload your completed work photo:</strong>
+        <div class="chat-upload-area" style="margin-top: 16px;">
+            <div class="chat-photo-box" onclick="document.getElementById('chatAfterInput').click()">
+                <input type="file" id="chatAfterInput" accept="image/*" onchange="window.handleChatPhotoUpload('after', this)" style="display:none">
+                <div id="chatAfterPlaceholder" style="text-align: center; padding: 40px;">
+                    <div style="font-size: 48px;">📷</div>
+                    <div style="margin-top: 8px; color: var(--text-secondary);">Tap to upload photo</div>
                 </div>
-                <div class="form-group">
-                    <label>Customer's Phone (for WhatsApp)</label>
-                    <input type="tel" id="customerPhone" placeholder="e.g. +1 512-555-0000" class="ref-input">
-                </div>
+                <img id="chatAfterPreview" style="display:none; width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px;">
             </div>
-
-            <!-- Step 2: Photo Upload -->
-            <div class="referral-step" id="referralStep2">
-                <div class="step-badge">Step 2</div>
-                <h3>Upload Job Photos</h3>
-
-                <div class="photo-toggle">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="hasBeforeAfter" onchange="window.toggleBeforeAfter(this.checked)">
-                        <span>I have Before & After photos</span>
-                    </label>
-                </div>
-
-                <div class="photo-upload-area" id="singlePhotoArea">
-                    <div class="photo-box" id="afterPhotoBox" onclick="window.triggerPhotoUpload('after')">
-                        <input type="file" id="afterPhotoInput" accept="image/*" onchange="window.handlePhotoUpload('after', this)" style="display:none">
-                        <div class="photo-placeholder" id="afterPlaceholder">
-                            <span class="upload-icon">📷</span>
-                            <span>Upload completed work photo</span>
-                        </div>
-                        <img id="afterPreview" class="photo-preview" style="display:none">
-                    </div>
-                </div>
-
-                <div class="photo-upload-area before-after" id="beforeAfterArea" style="display:none">
-                    <div class="photo-box" onclick="window.triggerPhotoUpload('before')">
-                        <input type="file" id="beforePhotoInput" accept="image/*" onchange="window.handlePhotoUpload('before', this)" style="display:none">
-                        <div class="photo-placeholder" id="beforePlaceholder">
-                            <span class="upload-icon">📷</span>
-                            <span>BEFORE</span>
-                        </div>
-                        <img id="beforePreview" class="photo-preview" style="display:none">
-                    </div>
-                    <div class="arrow-between">→</div>
-                    <div class="photo-box" onclick="window.triggerPhotoUpload('after2')">
-                        <input type="file" id="after2PhotoInput" accept="image/*" onchange="window.handlePhotoUpload('after', this)" style="display:none">
-                        <div class="photo-placeholder" id="after2Placeholder">
-                            <span class="upload-icon">📷</span>
-                            <span>AFTER</span>
-                        </div>
-                        <img id="after2Preview" class="photo-preview" style="display:none">
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-top: 16px;">
-                    <label>Brief description (optional - AI will analyze photo)</label>
-                    <input type="text" id="jobDescription" placeholder="e.g. Fixed burst pipe under kitchen sink" class="ref-input">
-                </div>
-            </div>
-
-            <!-- Generate Button -->
-            <button class="generate-btn" id="generateReferralBtn" onclick="window.generateReferralContent()">
-                ✨ Generate WhatsApp Message & Posts
-            </button>
         </div>
+    `, `
+        <div class="quick-replies" id="photoNextStep" style="display: none;">
+            <button class="quick-reply" onclick="window.proceedAfterPhoto()">✅ Continue</button>
+        </div>
+    `);
+    referralState.flowStep = 'upload_photo';
+}
 
-        <style>
-            .referral-flow {
-                max-width: 600px;
-                margin: 0 auto;
-                padding: 24px;
-            }
-            .referral-header {
-                text-align: center;
-                margin-bottom: 32px;
-            }
-            .referral-icon {
-                font-size: 48px;
-                display: block;
-                margin-bottom: 12px;
-            }
-            .referral-header h2 {
-                margin: 0 0 8px;
-                font-size: 28px;
-            }
-            .referral-header p {
-                color: var(--text-secondary);
-                margin: 0;
-            }
-            .referral-step {
-                background: white;
-                border-radius: 16px;
-                padding: 24px;
-                margin-bottom: 20px;
-                border: 1px solid var(--border);
-            }
-            .step-badge {
-                display: inline-block;
-                background: var(--primary-light);
-                color: var(--primary);
-                padding: 4px 12px;
-                border-radius: 20px;
-                font-size: 12px;
-                font-weight: 600;
-                margin-bottom: 12px;
-            }
-            .referral-step h3 {
-                margin: 0 0 16px;
-                font-size: 18px;
-            }
-            .form-group {
-                margin-bottom: 16px;
-            }
-            .form-group label {
-                display: block;
-                font-size: 14px;
-                font-weight: 500;
-                margin-bottom: 6px;
-                color: var(--text-secondary);
-            }
-            .ref-input {
-                width: 100%;
-                padding: 12px 16px;
-                border: 2px solid var(--border);
-                border-radius: 10px;
-                font-size: 15px;
-                transition: border-color 0.2s;
-            }
-            .ref-input:focus {
-                outline: none;
-                border-color: var(--primary);
-            }
-            .biz-info-card {
-                background: var(--primary-light);
-                border-radius: 12px;
-                padding: 16px;
-                margin-bottom: 16px;
-            }
-            .biz-info-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 8px;
-                font-size: 12px;
-                color: var(--primary);
-                font-weight: 600;
-            }
-            .edit-btn {
-                background: none;
-                border: none;
-                color: var(--primary);
-                cursor: pointer;
-                font-size: 12px;
-            }
-            .biz-info-content {
-                font-size: 15px;
-            }
-            .photo-toggle {
-                margin-bottom: 16px;
-            }
-            .toggle-label {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                cursor: pointer;
-                font-size: 14px;
-            }
-            .toggle-label input {
-                width: 18px;
-                height: 18px;
-                cursor: pointer;
-            }
-            .photo-upload-area {
-                display: flex;
-                gap: 16px;
-                justify-content: center;
-            }
-            .photo-upload-area.before-after {
-                align-items: center;
-            }
-            .arrow-between {
-                font-size: 24px;
-                color: var(--primary);
-            }
-            .photo-box {
-                flex: 1;
-                max-width: 200px;
-                aspect-ratio: 1;
-                border: 2px dashed var(--border);
-                border-radius: 12px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                transition: border-color 0.2s, background 0.2s;
-                overflow: hidden;
-                position: relative;
-            }
-            .photo-box:hover {
-                border-color: var(--primary);
-                background: var(--primary-light);
-            }
-            .photo-placeholder {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 8px;
-                color: var(--text-secondary);
-            }
-            .upload-icon {
-                font-size: 32px;
-            }
-            .photo-preview {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-            .generate-btn {
-                width: 100%;
-                padding: 18px;
-                background: linear-gradient(135deg, #25D366, #128C7E);
-                color: white;
-                border: none;
-                border-radius: 12px;
-                font-size: 18px;
-                font-weight: 700;
-                cursor: pointer;
-                transition: transform 0.2s, box-shadow 0.2s;
-            }
-            .generate-btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 24px rgba(37, 211, 102, 0.3);
-            }
-            .generate-btn:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
-                transform: none;
-            }
-        </style>
-    `;
+// Show before/after upload in chat
+function showBeforeAfterUpload() {
+    addChatBubble('assistant', `
+        <strong>📸 Upload your Before & After photos:</strong>
+        <div class="chat-upload-area" style="margin-top: 16px; display: flex; gap: 12px; align-items: center;">
+            <div class="chat-photo-box" onclick="document.getElementById('chatBeforeInput').click()" style="flex: 1;">
+                <input type="file" id="chatBeforeInput" accept="image/*" onchange="window.handleChatPhotoUpload('before', this)" style="display:none">
+                <div id="chatBeforePlaceholder" style="text-align: center; padding: 30px;">
+                    <div style="font-size: 32px;">📷</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">BEFORE</div>
+                </div>
+                <img id="chatBeforePreview" style="display:none; width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">
+            </div>
+            <div style="font-size: 24px; color: var(--primary);">→</div>
+            <div class="chat-photo-box" onclick="document.getElementById('chatAfterInput2').click()" style="flex: 1;">
+                <input type="file" id="chatAfterInput2" accept="image/*" onchange="window.handleChatPhotoUpload('after', this)" style="display:none">
+                <div id="chatAfter2Placeholder" style="text-align: center; padding: 30px;">
+                    <div style="font-size: 32px;">📷</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">AFTER</div>
+                </div>
+                <img id="chatAfter2Preview" style="display:none; width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">
+            </div>
+        </div>
+    `, `
+        <div class="quick-replies" id="photoNextStep" style="display: none;">
+            <button class="quick-reply" onclick="window.proceedAfterPhoto()">✅ Continue</button>
+        </div>
+    `);
+    referralState.flowStep = 'upload_photo';
+}
 
-    chatArea.innerHTML = html;
+// Handle chat photo upload
+export function handleChatPhotoUpload(type, input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const imageData = e.target.result;
+
+        if (type === 'before') {
+            referralState.beforePhoto = imageData;
+            const preview = document.getElementById('chatBeforePreview');
+            const placeholder = document.getElementById('chatBeforePlaceholder');
+            if (preview) { preview.src = imageData; preview.style.display = 'block'; }
+            if (placeholder) placeholder.style.display = 'none';
+        } else {
+            referralState.afterPhoto = imageData;
+            // Update all after previews
+            ['chatAfterPreview', 'chatAfter2Preview'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.src = imageData; el.style.display = 'block'; }
+            });
+            ['chatAfterPlaceholder', 'chatAfter2Placeholder'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+        }
+
+        // Show continue button
+        const nextBtn = document.getElementById('photoNextStep');
+        if (nextBtn && referralState.afterPhoto) {
+            nextBtn.style.display = 'flex';
+        }
+
+        showToast('Photo uploaded!');
+    };
+    reader.readAsDataURL(file);
+}
+
+// Proceed after photo upload
+export function proceedAfterPhoto() {
+    if (!referralState.afterPhoto) {
+        showToast('Please upload a photo first');
+        return;
+    }
+
+    addChatBubble('user', '📷 Photo uploaded');
+
+    setTimeout(() => {
+        addChatBubble('assistant', `
+            <strong>Great photo!</strong> 📸<br><br>
+            Briefly describe the work you did:<br>
+            <span style="color: var(--text-secondary); font-size: 13px;">(e.g., "Fixed burst pipe under kitchen sink")</span>
+        `);
+        referralState.flowStep = 'job_description';
+    }, 300);
+}
+
+// Generate referral from conversation
+async function generateReferralFromConversation() {
+    // Show agent hiring animation
+    addChatBubble('assistant', `
+        <div class="agent-flow">
+            <div class="flow-step active">
+                <div class="step-header">📱 Generating Review Request</div>
+                <div class="step-agents">
+                    <div class="agent-item hiring">📝 Message Writer Agent</div>
+                    <div class="agent-item hiring">🎁 Referral Code Generator</div>
+                    <div class="agent-item">📣 Social Post Writer</div>
+                </div>
+                <div class="step-status">Creating personalized WhatsApp message...</div>
+            </div>
+        </div>
+    `);
+
+    // Get or create business info
+    let biz = state.businessInfo;
+    if (!biz || !biz.name) {
+        biz = { name: 'Your Business', location: 'Local Area', trade: 'professional' };
+    }
+
+    try {
+        const response = await fetch('/api/generate-referral', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                business: biz,
+                customerName: referralState.customerName,
+                jobDescription: referralState.jobDescription,
+                hasBeforeAfter: referralState.hasBeforeAfter,
+                afterPhoto: referralState.afterPhoto
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            await delay(500);
+            displayReferralResult(data);
+        } else {
+            const localResult = generateLocalReferralContent();
+            await delay(500);
+            displayReferralResult({ success: true, ...localResult });
+        }
+    } catch (error) {
+        console.error('Generate referral error:', error);
+        const localResult = generateLocalReferralContent();
+        await delay(500);
+        displayReferralResult({ success: true, ...localResult });
+    }
 }
 
 // Toggle before/after photo mode
@@ -812,4 +755,9 @@ if (typeof window !== 'undefined') {
     window.copyWhatsAppMessage = copyWhatsAppMessage;
     window.editWhatsAppMessage = editWhatsAppMessage;
     window.openReferralPreview = openReferralPreview;
+    // New conversation flow functions
+    window.processReferralInput = processReferralInput;
+    window.selectPhotoType = selectPhotoType;
+    window.handleChatPhotoUpload = handleChatPhotoUpload;
+    window.proceedAfterPhoto = proceedAfterPhoto;
 }

@@ -217,15 +217,72 @@ export function selectTopicFromChat(topic) {
 // Generate all content
 export async function generateAllContent() {
     addChatBubble('user', 'Generate content');
+    const trade = state.selectedTrade || 'plumber';
+    const tradeIcon = getTradeIcon(trade);
+    const tradeName = capitalize(trade);
 
+    // Step 1: Show hiring agents
     await delay(300);
     addChatBubble('assistant', `
-        <strong>✨ Generating your content pack...</strong><br><br>
-        <div id="gen-progress">
-            <div>📍 Creating Google Business post...</div>
-            <div>📘 Creating Facebook post...</div>
-            <div>🏘️ Creating Nextdoor post...</div>
-            <div>🖼️ Generating AI images...</div>
+        <div class="agent-flow">
+            <div class="flow-step active" id="step-discover">
+                <div class="step-header">🔍 Step 1: DISCOVER</div>
+                <div class="step-agents">
+                    <div class="agent-item hiring">🌡️ Local Weather Agent</div>
+                    <div class="agent-item">📰 Community News Agent</div>
+                    <div class="agent-item">📊 Trend Radar Agent</div>
+                </div>
+                <div class="step-status">Analyzing local opportunities...</div>
+            </div>
+        </div>
+    `);
+
+    await delay(800);
+
+    // Step 2: Connect
+    addChatBubble('assistant', `
+        <div class="agent-flow">
+            <div class="flow-step active" id="step-connect">
+                <div class="step-header">💡 Step 2: CONNECT</div>
+                <div class="step-agents">
+                    <div class="agent-item hiring">${tradeIcon} ${tradeName} Expert Agent</div>
+                    <div class="agent-item">🧠 Local Psychology Agent</div>
+                </div>
+                <div class="step-status">Finding the best angle for your audience...</div>
+            </div>
+        </div>
+    `);
+
+    await delay(600);
+
+    // Step 3: Strategize
+    addChatBubble('assistant', `
+        <div class="agent-flow">
+            <div class="flow-step active" id="step-strategize">
+                <div class="step-header">📊 Step 3: STRATEGIZE</div>
+                <div class="step-agents">
+                    <div class="agent-item hiring">📱 Platform Strategist</div>
+                </div>
+                <div class="step-status">Selecting best platforms: Google Business, Facebook, Nextdoor</div>
+            </div>
+        </div>
+    `);
+
+    await delay(600);
+
+    // Step 4: Generate
+    addChatBubble('assistant', `
+        <div class="agent-flow">
+            <div class="flow-step active" id="step-generate">
+                <div class="step-header">✍️ Step 4: GENERATE</div>
+                <div class="step-agents">
+                    <div class="agent-item hiring">📍 Google Business Writer</div>
+                    <div class="agent-item hiring">📘 Facebook Writer</div>
+                    <div class="agent-item hiring">🏘️ Nextdoor Writer</div>
+                    <div class="agent-item">🖼️ AI Image Generator</div>
+                </div>
+                <div class="step-status">Creating platform-optimized content...</div>
+            </div>
         </div>
     `);
 
@@ -298,11 +355,53 @@ export function showHistory() {
 
 // Show auto publish
 export function showAutoPublish() {
-    addChatBubble('assistant', `
-        <strong>🚀 Auto Publish</strong><br><br>
-        Set up automatic posting schedules to keep your social media active.<br><br>
-        <em>Coming soon! This feature is in development.</em>
-    `);
+    const chatArea = document.getElementById('chatArea');
+    const welcome = chatArea.querySelector('.welcome');
+    if (welcome) welcome.remove();
+
+    chatArea.innerHTML = `
+        <div style="max-width: 700px; margin: 0 auto; padding: 24px;">
+            <div style="text-align: center; margin-bottom: 32px;">
+                <div style="font-size: 48px; margin-bottom: 12px;">🚀</div>
+                <h2 style="margin-bottom: 8px;">Auto Publish</h2>
+                <p style="color: var(--text-secondary);">Schedule posts to keep your social media active</p>
+            </div>
+
+            <div style="background: white; border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid var(--border);">
+                <h3 style="margin-bottom: 16px;">📅 Scheduled Posts</h3>
+                <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                    <div style="font-size: 32px; margin-bottom: 12px;">📭</div>
+                    <p>No scheduled posts yet</p>
+                    <p style="font-size: 13px; margin-top: 8px;">Generate content first, then schedule it for later</p>
+                </div>
+            </div>
+
+            <div style="background: white; border-radius: 16px; padding: 24px; border: 1px solid var(--border);">
+                <h3 style="margin-bottom: 16px;">⚡ Quick Schedule</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                    <div style="background: var(--bg); padding: 16px; border-radius: 12px; text-align: center; cursor: pointer;" onclick="window.location.href='chat.html'">
+                        <div style="font-size: 24px; margin-bottom: 8px;">📍</div>
+                        <div style="font-weight: 500; font-size: 14px;">Google Business</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">Weekly updates</div>
+                    </div>
+                    <div style="background: var(--bg); padding: 16px; border-radius: 12px; text-align: center; cursor: pointer;" onclick="window.location.href='chat.html'">
+                        <div style="font-size: 24px; margin-bottom: 8px;">🏘️</div>
+                        <div style="font-weight: 500; font-size: 14px;">Nextdoor</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">2x per week</div>
+                    </div>
+                    <div style="background: var(--bg); padding: 16px; border-radius: 12px; text-align: center; cursor: pointer;" onclick="window.location.href='chat.html'">
+                        <div style="font-size: 24px; margin-bottom: 8px;">📘</div>
+                        <div style="font-weight: 500; font-size: 14px;">Facebook</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">3x per week</div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="window.location.href='chat.html'" style="width: 100%; margin-top: 20px; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer;">
+                ← Back to WorkSpace
+            </button>
+        </div>
+    `;
 }
 
 // Select trade

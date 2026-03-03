@@ -12,7 +12,7 @@ import { sendMessage, generateContentPack, regenerateImage } from './api-client.
 import './modals.js';  // Auto-registers window functions
 import './preview-renders.js';  // Auto-registers window functions
 import './utils.js';  // Auto-registers window functions
-import './referral-flow.js';  // WhatsApp Referral flow
+import { referralState, processReferralInput } from './referral-flow.js';  // WhatsApp Referral flow
 
 // Initialize app
 function init() {
@@ -48,10 +48,16 @@ function init() {
                 // Use conversation flow instead of direct API
                 const message = this.value.trim();
                 if (message) {
-                    addChatBubble('user', message);
                     this.value = '';
                     this.style.height = 'auto';
-                    processConversation(message);
+
+                    // Check if in referral flow
+                    if (referralState.flowStep && ['customer_name', 'customer_phone', 'job_description'].includes(referralState.flowStep)) {
+                        processReferralInput(message);
+                    } else {
+                        addChatBubble('user', message);
+                        processConversation(message);
+                    }
                 }
                 return false;
             }

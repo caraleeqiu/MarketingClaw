@@ -1652,3 +1652,76 @@
             background: var(--bg);
             border-radius: 6px;
         }
+
+        /* Agent Flow Styles */
+        .agent-flow {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 8px 0;
+        }
+        .flow-step {
+            margin-bottom: 0;
+        }
+        .flow-step.active .step-header {
+            color: var(--primary);
+        }
+        .step-header {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .step-agents {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .agent-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .agent-item.hiring {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+            animation: pulse-agent 1.5s infinite;
+        }
+        @keyframes pulse-agent {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(255, 107, 53, 0); }
+        }
+        .step-status {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* Chat Photo Upload Styles */
+        .chat-upload-area {
+            margin-top: 12px;
+        }
+        .chat-photo-box {
+            background: var(--bg);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            overflow: hidden;
+        }
+        .chat-photo-box:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
