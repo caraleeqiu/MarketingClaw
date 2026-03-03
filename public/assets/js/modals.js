@@ -194,12 +194,48 @@ export function openPublishModal(platform) {
                         <button onclick="window.disconnectAccount('${platform}')" style="padding: 6px 12px; background: var(--bg); border: none; border-radius: 6px; font-size: 13px; cursor: pointer;">Disconnect</button>
                     </div>
                 ` : `
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 32px; margin-bottom: 12px;">${p.icon}</div>
-                        <p style="color: var(--text-secondary); margin-bottom: 16px;">Connect your ${p.name} account to publish directly</p>
-                        <button onclick="window.connectAccount('${platform}')" style="padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                            🔗 Connect ${p.name}
+                    <div style="padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 24px;">
+                            <div style="font-size: 48px; margin-bottom: 12px;">${p.icon}</div>
+                            <h3 style="margin: 0 0 8px;">Connect ${p.name}</h3>
+                            <p style="color: var(--text-secondary); margin: 0;">One-time setup to enable direct publishing</p>
+                        </div>
+
+                        <div style="background: var(--bg); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                            <div style="font-weight: 600; margin-bottom: 12px;">📋 Setup Steps:</div>
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 28px; height: 28px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">1</div>
+                                    <span>Click "Connect" to authorize MarketingClaw</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 28px; height: 28px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">2</div>
+                                    <span>Log in to your ${p.name} account</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 28px; height: 28px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">3</div>
+                                    <span>Grant permission to post on your behalf</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: #e8f5e9; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <span style="font-size: 20px;">🔒</span>
+                                <div>
+                                    <div style="font-weight: 600; color: #2e7d32;">Secure & Private</div>
+                                    <div style="font-size: 13px; color: #558b2f;">We only post content you approve. Revoke access anytime from your ${p.name} settings.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="window.connectAccount('${platform}')" style="width: 100%; padding: 16px 24px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            🔗 Connect ${p.name} Account
                         </button>
+
+                        <p style="text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-secondary);">
+                            Or <a href="#" onclick="window.copyPlatformContent('${platform}'); return false;" style="color: var(--primary);">copy content</a> to post manually
+                        </p>
                     </div>
                 `}
             </div>
