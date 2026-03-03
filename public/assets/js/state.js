@@ -56,7 +56,7 @@ export function saveToHistory(pack, biz, topic) {
             business: biz.name,
             trade: biz.trade,
             location: biz.location || 'Local Area',
-            phone: biz.phone || '(555) 123-4567',
+            phone: biz.phone || '',
             topic: topic,
             platforms: Object.keys(pack.platforms),
             status: 'draft',

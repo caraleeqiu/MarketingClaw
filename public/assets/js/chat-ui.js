@@ -123,7 +123,7 @@ export async function processConversation(message) {
                 name: nameMatch[1].trim(),
                 trade: state.selectedTrade,
                 location: locationMatch[1].trim(),
-                phone: phoneMatch ? phoneMatch[1] : '(555) 123-4567'
+                phone: phoneMatch ? phoneMatch[1] : ''
             };
 
             addChatBubble('assistant', `

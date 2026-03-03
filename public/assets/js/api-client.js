@@ -37,8 +37,13 @@ export async function sendMessage() {
             })
         });
 
-        const data = await response.json();
         loadingEl.remove();
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        const data = await response.json();
 
         if (data.success && data.response) {
             addMessage('assistant', data.response);
@@ -59,6 +64,12 @@ export async function sendMessage() {
 
 // Generate content pack
 export async function generateContentPack(business, topic) {
+    // Validate inputs
+    if (!business?.name || !business?.trade) {
+        addMessage('assistant', '⚠️ Please provide your business name and trade first.');
+        return;
+    }
+
     const chatArea = document.getElementById('chatArea');
 
     // Show progress

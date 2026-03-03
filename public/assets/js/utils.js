@@ -81,9 +81,12 @@ export function getTopicsForTrade(trade) {
 
 // Copy content to clipboard
 export function copyContent(platform) {
-    const content = document.getElementById(`content-${platform}`).textContent;
+    const content = document.getElementById(`content-${platform}`)?.textContent;
+    if (!content) return;
     navigator.clipboard.writeText(content).then(() => {
         showToast('Content copied!');
+    }).catch(() => {
+        showToast('Failed to copy - please copy manually');
     });
 }
 
@@ -105,8 +108,11 @@ export function copyPlatformContent(platform) {
         text = `${content.caption || content.content}\n\n${(content.hashtags || []).join(' ')}`;
     }
 
-    navigator.clipboard.writeText(text);
-    showToast('Content copied!');
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('Content copied!');
+    }).catch(() => {
+        showToast('Failed to copy');
+    });
 }
 
 // Download image

@@ -14,7 +14,7 @@ export function renderGooglePreview(pack, biz) {
     const fallback = fallbackImages[trade] || fallbackImages.default;
     const firstPara = content.content.split('\n')[0];
     const desc = firstPara.length > 200 ? firstPara.substring(0, 200) : firstPara;
-    const city = biz.location.split(',')[0];
+    const city = (biz.location || 'Local Area').split(',')[0];
     const cardId = 'gbp-card-' + Date.now();
 
     return `
@@ -81,7 +81,7 @@ export function renderGooglePreview(pack, biz) {
                 </div>
             </div>
             <div class="preview-actions" style="display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid #dadce0;">
-                <button onclick="window.regenerateImage('google')" style="padding: 10px; background: #fff3e0; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">🔄 换图</button>
+                <button onclick="window.regenerateImage('google')" style="padding: 10px; background: #fff3e0; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">🔄 New</button>
                 <button onclick="window.openEditModal('google')" style="flex: 1; padding: 10px; background: #f1f3f4; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">✏️ Edit</button>
                 <button onclick="window.copyPlatformContent('google')" style="flex: 1; padding: 10px; background: #f1f3f4; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">📋 Copy</button>
                 <button onclick="window.openPublishModal('google')" style="flex: 1; padding: 10px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">🚀 Publish</button>
@@ -162,7 +162,7 @@ export function renderFacebookPreview(pack, biz) {
                 <div class="fb-action">↗️ Share</div>
             </div>
             <div class="preview-actions">
-                <button style="background: #fff3e0;" onclick="event.stopPropagation(); window.regenerateImage('facebook')">🔄 换图</button>
+                <button style="background: #fff3e0;" onclick="event.stopPropagation(); window.regenerateImage('facebook')">🔄 New</button>
                 <button class="btn-edit" onclick="event.stopPropagation(); window.openEditModal('facebook')">✏️ Edit</button>
                 <button class="btn-publish-sm" onclick="event.stopPropagation(); window.quickPublish('facebook')">🚀 Publish</button>
             </div>
@@ -191,7 +191,7 @@ export function renderNextdoorPreview(pack, biz) {
             <img class="nd-image" src="${image}" alt="Post image" style="aspect-ratio: 16/9; object-fit: cover; width: 100%;" onerror="this.src='${fallbackImages[trade] || fallbackImages.default}'">
             <div class="nd-content" style="white-space: pre-line;">${text}</div>
             <div class="preview-actions">
-                <button style="background: #fff3e0;" onclick="event.stopPropagation(); window.regenerateImage('nextdoor')">🔄 换图</button>
+                <button style="background: #fff3e0;" onclick="event.stopPropagation(); window.regenerateImage('nextdoor')">🔄 New</button>
                 <button class="btn-edit" onclick="event.stopPropagation(); window.openEditModal('nextdoor')">✏️ Edit</button>
                 <button class="btn-publish-sm" onclick="event.stopPropagation(); window.quickPublish('nextdoor')">🚀 Publish</button>
             </div>

@@ -471,7 +471,7 @@ function generateLocalReferralContent() {
 Thanks for choosing ${biz.name} today! Here's a photo of the completed work.
 
 If you're happy with the service, we'd really appreciate a quick review - it helps other neighbors find us:
-⭐ Google: https://g.page/${biz.name.replace(/\s+/g, '')}
+⭐ Leave us a review on Google!
 
 🎁 REFERRAL BONUS: Get $25 off your next service for each friend you refer! Just have them mention code: ${referralCode}
 

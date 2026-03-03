@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<!-- v3.0 - Refactored: CSS and JS extracted to separate files -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkSpace - MarketingClaw</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/chat.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="index.html" class="logo">
+            <span class="logo-icon">🏠🔧</span>
+            <span>MarketingClaw</span>
+        </a>
+
+        <nav class="nav-menu">
+            <a href="marketplace.html" class="nav-item">
+                <span class="icon">🏪</span>
+                <span>Agent Hub</span>
+            </a>
+            <a href="chat.html" class="nav-item active">
+                <span class="icon">💬</span>
+                <span>WorkSpace</span>
+                <span class="badge" id="agentCount">0</span>
+            </a>
+
+            <!-- Hired Agents Section -->
+            <div id="hiredAgentsSection" style="display: none; padding: 12px; margin: 8px 12px; background: var(--primary-light); border-radius: 12px;">
+                <div style="font-size: 12px; font-weight: 600; color: var(--primary); margin-bottom: 8px;">🤝 Hired Agents</div>
+                <div id="hiredAgentsList" style="display: flex; flex-direction: column; gap: 6px;"></div>
+            </div>
+
+            <div class="nav-divider"></div>
+
+            <a href="#" class="nav-item" onclick="showHistory()">
+                <span class="icon">📅</span>
+                <span>History</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showAutoPublish()">
+                <span class="icon">🚀</span>
+                <span>Auto Publish</span>
+            </a>
+            <a href="pricing.html" class="nav-item">
+                <span class="icon">💰</span>
+                <span>Pricing</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar">P</div>
+                <div class="user-info">
+                    <div class="name">Home Pro</div>
+                    <div class="plan">Free Trial</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="chat-title">WorkSpace</div>
+            <div class="agent-selector" id="agentSelector">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area" id="chatArea">
+            <div class="welcome" id="welcomeScreen">
+                <div class="welcome-icon">🏠🔧</div>
+                <h2>Hi! I'm MarketingClaw</h2>
+                <p>Your AI marketing assistant for home service professionals.</p>
+                <p style="color: var(--text-secondary); margin-top: 20px; font-size: 15px;">Just say <strong>"hi"</strong> or tell me about your business to get started!</p>
+
+                <!-- Example prompts -->
+                <div style="margin-top: 30px;">
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">💡 Example messages:</p>
+                    <div style="display: flex; flex-direction: column; gap: 8px; max-width: 400px; margin: 0 auto;">
+                        <div class="example-msg" onclick="useExample(this)">"Hi, I need help with marketing"</div>
+                        <div class="example-msg" onclick="useExample(this)">"I'm a plumber in Seattle looking for more customers"</div>
+                        <div class="example-msg" onclick="useExample(this)">"Help me create a Google Business post"</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden Form for reference -->
+            <div class="business-form" id="businessForm" style="display: none;">
+                    <div class="form-row">
+                        <label>Industry</label>
+                        <div class="trade-selector">
+                            <button type="button" class="trade-btn" data-trade="plumber" onclick="selectTrade('plumber')">🔧 Plumber</button>
+                            <button type="button" class="trade-btn" data-trade="electrician" onclick="selectTrade('electrician')">⚡ Electrician</button>
+                            <button type="button" class="trade-btn" data-trade="hvac" onclick="selectTrade('hvac')">❄️ HVAC</button>
+                            <button type="button" class="trade-btn" data-trade="roofer" onclick="selectTrade('roofer')">🏠 Roofer</button>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>Business Name</label>
+                        <input type="text" id="bizName" placeholder="e.g. Mike's Plumbing">
+                    </div>
+                    <div class="form-row two-col">
+                        <div>
+                            <label>City & ZIP</label>
+                            <input type="text" id="bizLocation" placeholder="e.g. Austin, TX 78704">
+                        </div>
+                        <div>
+                            <label>Phone</label>
+                            <input type="text" id="bizPhone" placeholder="e.g. 512-555-1234">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>Image Style Reference (optional)</label>
+                        <input type="text" id="imageRef" placeholder="Paste URL or describe style...">
+                    </div>
+                    <button class="generate-pack-btn" onclick="analyzeLocalTrends()" id="analyzeBtn">
+                        🔍 Analyze Local Trends
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Topic Recommendations (hidden initially) -->
+            <div class="topic-recommendations" id="topicScreen" style="display:none;">
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="input-area">
+            <div class="active-agents" id="activeAgents"></div>
+            <div class="input-wrapper" style="position: relative;">
+                <!-- @ Mention Popup -->
+                <div class="mention-popup" id="mentionPopup" style="display: none;">
+                    <div class="mention-header">🤝 Hired Agents</div>
+                    <div id="mentionList"></div>
+                </div>
+                <textarea class="input-field" id="messageInput" placeholder="Describe what content you need..." rows="1"></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+            </div>
+            <div class="input-hint">💡 Tip: Type @ to mention hired agents. Example: @GoogleBusiness write a post about our spring special</div>
+        </div>
+    </main>
+
+    <!-- Publish Modal -->
+    <div class="publish-modal" id="publishModal">
+        <div class="publish-dialog">
+            <h3 id="publishTitle">📘 Publish to Facebook</h3>
+
+            <!-- Publish Options -->
+            <div class="publish-options" id="publishOptions">
+                <div class="option-tabs">
+                    <button class="option-tab active" onclick="switchPublishTab('now')">🚀 Publish Now</button>
+                    <button class="option-tab" onclick="switchPublishTab('schedule')">📅 Schedule</button>
+                </div>
+
+                <div class="option-content" id="publishNowContent">
+                    <p style="color: var(--text-secondary); margin: 16px 0;">Ready to publish immediately to your connected account.</p>
+                </div>
+
+                <div class="option-content" id="scheduleContent" style="display: none;">
+                    <div style="margin: 16px 0;">
+                        <label style="font-weight: 500; display: block; margin-bottom: 8px;">📅 Date & Time</label>
+                        <input type="datetime-local" id="scheduleTime" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                    </div>
+                    <div style="margin: 16px 0;">
+                        <label style="font-weight: 500; display: block; margin-bottom: 8px;">🔄 Repeat</label>
+                        <select id="scheduleRepeat" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                            <option value="">Don't repeat</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="biweekly">Every 2 weeks</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <div style="margin: 16px 0; display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="requireConfirm" checked>
+                        <label for="requireConfirm" style="font-size: 14px;">Notify me before publishing</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="publish-status" id="publishStatus" style="display: none;">
+                <div class="step" id="pubStep1">
+                    <div class="step-icon">1</div>
+                    <span>Preparing content...</span>
+                </div>
+                <div class="step" id="pubStep2">
+                    <div class="step-icon">2</div>
+                    <span>Uploading image...</span>
+                </div>
+                <div class="step" id="pubStep3">
+                    <div class="step-icon">3</div>
+                    <span>Publishing to platform...</span>
+                </div>
+            </div>
+            <div class="publish-result" id="publishResult" style="display:none;">
+                <div class="icon">✓</div>
+                <div class="message">Published successfully!</div>
+            </div>
+            <div class="actions">
+                <button class="btn-cancel" onclick="closePublishModal()">Close</button>
+                <button class="btn-confirm" id="publishConfirmBtn" onclick="confirmPublish()">🚀 Publish Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load JS modules -->
+    <script src="../assets/js/chat.js"></script>
+</body>
+</html>
