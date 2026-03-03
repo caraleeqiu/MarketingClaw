@@ -185,13 +185,37 @@ export function openPublishModal(platform) {
             <div style="background: white; padding: 16px; border-radius: 12px;">
                 <div style="font-weight: 600; margin-bottom: 12px;">🔗 Account Status</div>
                 ${isConnected ? `
-                    <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
                         <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), #FF8F6B); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">${p.icon}</div>
                         <div style="flex: 1;">
                             <div style="font-weight: 600;">${isConnected.name || p.name + ' Account'}</div>
                             <div style="font-size: 13px; color: var(--success);">✓ Connected</div>
                         </div>
                         <button onclick="window.disconnectAccount('${platform}')" style="padding: 6px 12px; background: var(--bg); border: none; border-radius: 6px; font-size: 13px; cursor: pointer;">Disconnect</button>
+                    </div>
+
+                    <!-- Schedule Options -->
+                    <div style="background: var(--bg); border-radius: 12px; padding: 16px;">
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                            <button id="tabNow" onclick="window.switchPublishTab('now')" style="flex: 1; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">🚀 Now</button>
+                            <button id="tabSchedule" onclick="window.switchPublishTab('schedule')" style="flex: 1; padding: 10px; background: white; color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer;">📅 Schedule</button>
+                        </div>
+
+                        <div id="scheduleOptions" style="display: none;">
+                            <div style="margin-bottom: 12px;">
+                                <label style="font-size: 13px; font-weight: 500; display: block; margin-bottom: 6px;">Date & Time</label>
+                                <input type="datetime-local" id="scheduleDateTime" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <label style="font-size: 13px; font-weight: 500; display: block; margin-bottom: 6px;">Repeat</label>
+                                <select id="scheduleRepeatSelect" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;">
+                                    <option value="">Don't repeat</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 ` : `
                     <div style="padding: 20px;">
@@ -264,14 +288,45 @@ export function closePublishModal() {
 
 export function switchPublishTab(mode) {
     state.publishMode = mode;
-    document.querySelectorAll('.option-tab').forEach(t => t.classList.remove('active'));
-    event?.target?.classList.add('active');
 
+    // Update tab buttons
+    const tabNow = document.getElementById('tabNow');
+    const tabSchedule = document.getElementById('tabSchedule');
+    if (tabNow) {
+        tabNow.style.background = mode === 'now' ? 'var(--primary)' : 'white';
+        tabNow.style.color = mode === 'now' ? 'white' : 'var(--text)';
+        tabNow.style.border = mode === 'now' ? 'none' : '1px solid var(--border)';
+    }
+    if (tabSchedule) {
+        tabSchedule.style.background = mode === 'schedule' ? 'var(--primary)' : 'white';
+        tabSchedule.style.color = mode === 'schedule' ? 'white' : 'var(--text)';
+        tabSchedule.style.border = mode === 'schedule' ? 'none' : '1px solid var(--border)';
+    }
+
+    // Show/hide schedule options
+    const scheduleOptions = document.getElementById('scheduleOptions');
+    if (scheduleOptions) {
+        scheduleOptions.style.display = mode === 'schedule' ? 'block' : 'none';
+    }
+
+    // Set default datetime to tomorrow 9am
+    if (mode === 'schedule') {
+        const dateInput = document.getElementById('scheduleDateTime');
+        if (dateInput && !dateInput.value) {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(9, 0, 0, 0);
+            dateInput.value = tomorrow.toISOString().slice(0, 16);
+        }
+    }
+
+    // Legacy tab support
     const nowContent = document.getElementById('publishNowContent');
     const scheduleContent = document.getElementById('scheduleContent');
     if (nowContent) nowContent.style.display = mode === 'now' ? 'block' : 'none';
     if (scheduleContent) scheduleContent.style.display = mode === 'schedule' ? 'block' : 'none';
 
+    // Update confirm button
     const btn = document.getElementById('publishConfirmBtn');
     if (btn) btn.textContent = mode === 'now' ? '🚀 Publish Now' : '📅 Schedule Post';
 }
@@ -280,12 +335,56 @@ export async function confirmPublish() {
     if (!state.currentPublishPlatform || !state.generatedContent) return;
 
     const confirmBtn = document.getElementById('publishConfirmBtn');
+    const isScheduled = state.publishMode === 'schedule';
+    const scheduleDateTime = document.getElementById('scheduleDateTime')?.value;
+    const scheduleRepeat = document.getElementById('scheduleRepeatSelect')?.value;
+
     if (confirmBtn) {
         confirmBtn.disabled = true;
-        confirmBtn.textContent = 'Publishing...';
+        confirmBtn.textContent = isScheduled ? 'Scheduling...' : 'Publishing...';
     }
 
     try {
+        // If scheduling, show scheduled confirmation
+        if (isScheduled && scheduleDateTime) {
+            await delay(800);
+
+            const scheduledDate = new Date(scheduleDateTime);
+            const formattedDate = scheduledDate.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+
+            const repeatText = scheduleRepeat ? ` (Repeats ${scheduleRepeat})` : '';
+
+            const statusEl = document.getElementById('publishStatus');
+            if (statusEl) statusEl.style.display = 'none';
+
+            const result = document.getElementById('publishResult');
+            if (result) {
+                result.className = 'publish-result success';
+                result.innerHTML = `
+                    <div class="icon">📅</div>
+                    <div class="message">Scheduled for ${platformNames[state.currentPublishPlatform]?.name || state.currentPublishPlatform}!</div>
+                    <p style="margin-top:10px; font-size:14px; color:var(--text-secondary);">${formattedDate}${repeatText}</p>
+                    <div style="margin-top: 16px; padding: 12px; background: var(--bg); border-radius: 8px; font-size: 13px;">
+                        <strong>What happens next:</strong><br>
+                        We'll send you a reminder 30 min before posting. You can modify or cancel anytime from the History tab.
+                    </div>
+                `;
+                result.style.display = 'block';
+            }
+            if (confirmBtn) confirmBtn.style.display = 'none';
+
+            // Save to scheduled posts
+            saveScheduledPost(state.currentPublishPlatform, scheduleDateTime, scheduleRepeat);
+            return;
+        }
+
+        // Immediate publish flow
         updatePublishStep(1, 'active');
         await delay(800);
         updatePublishStep(1, 'done');
@@ -377,6 +476,33 @@ export function quickPublish(platform) {
 
 export function publishAll() {
     showToast('Publishing to all platforms...');
+}
+
+// Save scheduled post to localStorage
+function saveScheduledPost(platform, dateTime, repeat) {
+    try {
+        const scheduled = JSON.parse(localStorage.getItem('marketingclaw_scheduled') || '[]');
+        const newPost = {
+            id: Date.now(),
+            platform,
+            dateTime,
+            repeat: repeat || null,
+            content: state.generatedContent?.pack?.platforms?.[platform],
+            image: state.generatedContent?.pack?.images?.[platform],
+            business: state.businessInfo,
+            createdAt: new Date().toISOString()
+        };
+        scheduled.push(newPost);
+        localStorage.setItem('marketingclaw_scheduled', JSON.stringify(scheduled));
+        showToast('📅 Post scheduled!');
+    } catch (e) {
+        console.error('Failed to save scheduled post:', e);
+    }
+}
+
+// Get scheduled posts
+export function getScheduledPosts() {
+    return JSON.parse(localStorage.getItem('marketingclaw_scheduled') || '[]');
 }
 
 // Export functions to window for HTML onclick handlers
