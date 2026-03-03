@@ -165,6 +165,44 @@ export function selectTradeFromChat(trade) {
 
 // Show topic recommendations in chat
 export async function showTopicRecommendationsChat() {
+    const trade = state.selectedTrade || 'plumber';
+    const tradeIcon = getTradeIcon(trade);
+    const tradeName = capitalize(trade);
+
+    // Step 1: DISCOVER - Show agents analyzing
+    addChatBubble('assistant', `
+        <div class="agent-flow">
+            <div class="flow-step active">
+                <div class="step-header">🔍 DISCOVER: Hiring Research Agents</div>
+                <div class="step-agents">
+                    <div class="agent-item hiring">🌡️ Local Weather Agent</div>
+                    <div class="agent-item hiring">📰 Community News Agent</div>
+                    <div class="agent-item hiring">📊 Trend Radar Agent</div>
+                </div>
+                <div class="step-status">Analyzing ${state.businessInfo?.location || 'your area'}...</div>
+            </div>
+        </div>
+    `);
+
+    await delay(1200);
+
+    // Step 2: Show expert agent
+    addChatBubble('assistant', `
+        <div class="agent-flow">
+            <div class="flow-step active">
+                <div class="step-header">💡 ANALYZE: Hiring ${tradeName} Expert</div>
+                <div class="step-agents">
+                    <div class="agent-item hiring">${tradeIcon} ${tradeName} Industry Expert</div>
+                    <div class="agent-item hiring">📈 Market Trend Analyst</div>
+                </div>
+                <div class="step-status">Finding best topics for ${tradeName}s...</div>
+            </div>
+        </div>
+    `);
+
+    await delay(1000);
+
+    // Now show topics
     const topics = getTopicsForTrade(state.selectedTrade);
 
     addChatBubble('assistant', `
