@@ -4,7 +4,7 @@
  */
 
 import { state, getHistory, saveToHistory } from './state.js';
-import { quickPrompts, topicsByTrade, workflowStages, getWorkflowAgents } from './config.js';
+import { quickPrompts, topicsByTrade } from './config.js';
 import { formatMarkdown, capitalize, getTradeIcon, getTopicsForTrade, delay, getSelectedPlatforms } from './utils.js';
 import { renderGooglePreview, renderFacebookPreview, renderNextdoorPreview, renderInstagramPreview, generateGoogleBusinessContent } from './preview-renders.js';
 
@@ -164,22 +164,58 @@ export function selectTradeFromChat(trade) {
     }, 300);
 }
 
-// Render workflow stage with dynamic agents
+// Render workflow stage - hardcoded for reliability
 function renderWorkflowStage(stageName, trade, customStatus = null) {
-    const stage = workflowStages[stageName];
-    if (!stage) return '';
+    const tradeIcons = { plumber: '🔧', electrician: '⚡', hvac: '❄️', roofer: '🏠' };
+    const tradeIcon = tradeIcons[trade] || '🔧';
+    const tradeName = trade.charAt(0).toUpperCase() + trade.slice(1);
 
-    const agents = getWorkflowAgents(stageName, trade);
-    const agentsHtml = agents.map(a =>
-        `<div class="agent-item hiring">${a.icon} ${a.name}</div>`
-    ).join('');
+    const stages = {
+        discover: {
+            icon: '🔍',
+            name: 'DISCOVER',
+            agents: `
+                <div class="agent-item hiring">🌤️ Weather Finder</div>
+                <div class="agent-item hiring">📍 Trend Radar</div>
+                <div class="agent-item hiring">🕵️ Competitor Intel</div>
+            `
+        },
+        analyze: {
+            icon: '💡',
+            name: 'ANALYZE',
+            agents: `
+                <div class="agent-item hiring">${tradeIcon} ${tradeName} AI</div>
+                <div class="agent-item hiring">📊 Local SEO</div>
+            `
+        },
+        strategize: {
+            icon: '📊',
+            name: 'STRATEGIZE',
+            agents: `
+                <div class="agent-item hiring">📍 Google Business</div>
+                <div class="agent-item hiring">🏘️ Nextdoor Pro</div>
+                <div class="agent-item hiring">📘 Facebook Local</div>
+            `
+        },
+        generate: {
+            icon: '✍️',
+            name: 'GENERATE',
+            agents: `
+                <div class="agent-item hiring">✍️ Pro Copywriter</div>
+                <div class="agent-item hiring">📸 Before/After</div>
+            `
+        }
+    };
+
+    const stage = stages[stageName];
+    if (!stage) return '';
 
     return `
         <div class="agent-flow">
             <div class="flow-step active">
                 <div class="step-header">${stage.icon} ${stage.name}: Hiring Agents</div>
-                <div class="step-agents">${agentsHtml}</div>
-                <div class="step-status">${customStatus || stage.status}</div>
+                <div class="step-agents">${stage.agents}</div>
+                <div class="step-status">${customStatus || 'Processing...'}</div>
             </div>
         </div>
     `;
