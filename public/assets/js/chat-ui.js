@@ -4,7 +4,7 @@
  */
 
 import { state, getHistory, saveToHistory } from './state.js';
-import { quickPrompts, topicsByTrade } from './config.js';
+import { quickPrompts, topicsByTrade, workflowStages, getWorkflowAgents } from './config.js';
 import { formatMarkdown, capitalize, getTradeIcon, getTopicsForTrade, delay, getSelectedPlatforms } from './utils.js';
 import { renderGooglePreview, renderFacebookPreview, renderNextdoorPreview, renderInstagramPreview, generateGoogleBusinessContent } from './preview-renders.js';
 
@@ -163,43 +163,38 @@ export function selectTradeFromChat(trade) {
     }, 300);
 }
 
+// Render workflow stage with dynamic agents
+function renderWorkflowStage(stageName, trade, customStatus = null) {
+    const stage = workflowStages[stageName];
+    if (!stage) return '';
+
+    const agents = getWorkflowAgents(stageName, trade);
+    const agentsHtml = agents.map(a =>
+        `<div class="agent-item hiring">${a.icon} ${a.name}</div>`
+    ).join('');
+
+    return `
+        <div class="agent-flow">
+            <div class="flow-step active">
+                <div class="step-header">${stage.icon} ${stage.name}: Hiring Agents</div>
+                <div class="step-agents">${agentsHtml}</div>
+                <div class="step-status">${customStatus || stage.status}</div>
+            </div>
+        </div>
+    `;
+}
+
 // Show topic recommendations in chat
 export async function showTopicRecommendationsChat() {
     const trade = state.selectedTrade || 'plumber';
-    const tradeIcon = getTradeIcon(trade);
-    const tradeName = capitalize(trade);
+    const location = state.businessInfo?.location || 'your area';
 
-    // Step 1: DISCOVER - Show agents analyzing
-    addChatBubble('assistant', `
-        <div class="agent-flow">
-            <div class="flow-step active">
-                <div class="step-header">🔍 DISCOVER: Hiring Research Agents</div>
-                <div class="step-agents">
-                    <div class="agent-item hiring">🌡️ Local Weather Agent</div>
-                    <div class="agent-item hiring">📰 Community News Agent</div>
-                    <div class="agent-item hiring">📊 Trend Radar Agent</div>
-                </div>
-                <div class="step-status">Analyzing ${state.businessInfo?.location || 'your area'}...</div>
-            </div>
-        </div>
-    `);
-
+    // Step 1: DISCOVER
+    addChatBubble('assistant', renderWorkflowStage('discover', trade, `Analyzing ${location}...`));
     await delay(1200);
 
-    // Step 2: Show expert agent
-    addChatBubble('assistant', `
-        <div class="agent-flow">
-            <div class="flow-step active">
-                <div class="step-header">💡 ANALYZE: Hiring ${tradeName} Expert</div>
-                <div class="step-agents">
-                    <div class="agent-item hiring">${tradeIcon} ${tradeName} Industry Expert</div>
-                    <div class="agent-item hiring">📈 Market Trend Analyst</div>
-                </div>
-                <div class="step-status">Finding best topics for ${tradeName}s...</div>
-            </div>
-        </div>
-    `);
-
+    // Step 2: ANALYZE
+    addChatBubble('assistant', renderWorkflowStage('analyze', trade, `Finding best topics for ${capitalize(trade)}s...`));
     await delay(1000);
 
     // Now show topics
@@ -256,73 +251,22 @@ export function selectTopicFromChat(topic) {
 export async function generateAllContent() {
     addChatBubble('user', 'Generate content');
     const trade = state.selectedTrade || 'plumber';
-    const tradeIcon = getTradeIcon(trade);
-    const tradeName = capitalize(trade);
 
-    // Step 1: Show hiring agents
+    // Step 1: DISCOVER
     await delay(300);
-    addChatBubble('assistant', `
-        <div class="agent-flow">
-            <div class="flow-step active" id="step-discover">
-                <div class="step-header">🔍 Step 1: DISCOVER</div>
-                <div class="step-agents">
-                    <div class="agent-item hiring">🌡️ Local Weather Agent</div>
-                    <div class="agent-item">📰 Community News Agent</div>
-                    <div class="agent-item">📊 Trend Radar Agent</div>
-                </div>
-                <div class="step-status">Analyzing local opportunities...</div>
-            </div>
-        </div>
-    `);
-
+    addChatBubble('assistant', renderWorkflowStage('discover', trade));
     await delay(800);
 
-    // Step 2: Connect
-    addChatBubble('assistant', `
-        <div class="agent-flow">
-            <div class="flow-step active" id="step-connect">
-                <div class="step-header">💡 Step 2: CONNECT</div>
-                <div class="step-agents">
-                    <div class="agent-item hiring">${tradeIcon} ${tradeName} Expert Agent</div>
-                    <div class="agent-item">🧠 Local Psychology Agent</div>
-                </div>
-                <div class="step-status">Finding the best angle for your audience...</div>
-            </div>
-        </div>
-    `);
-
+    // Step 2: ANALYZE
+    addChatBubble('assistant', renderWorkflowStage('analyze', trade));
     await delay(600);
 
-    // Step 3: Strategize
-    addChatBubble('assistant', `
-        <div class="agent-flow">
-            <div class="flow-step active" id="step-strategize">
-                <div class="step-header">📊 Step 3: STRATEGIZE</div>
-                <div class="step-agents">
-                    <div class="agent-item hiring">📱 Platform Strategist</div>
-                </div>
-                <div class="step-status">Selecting best platforms: Google Business, Facebook, Nextdoor</div>
-            </div>
-        </div>
-    `);
-
+    // Step 3: STRATEGIZE
+    addChatBubble('assistant', renderWorkflowStage('strategize', trade));
     await delay(600);
 
-    // Step 4: Generate
-    addChatBubble('assistant', `
-        <div class="agent-flow">
-            <div class="flow-step active" id="step-generate">
-                <div class="step-header">✍️ Step 4: GENERATE</div>
-                <div class="step-agents">
-                    <div class="agent-item hiring">📍 Google Business Writer</div>
-                    <div class="agent-item hiring">📘 Facebook Writer</div>
-                    <div class="agent-item hiring">🏘️ Nextdoor Writer</div>
-                    <div class="agent-item">🖼️ AI Image Generator</div>
-                </div>
-                <div class="step-status">Creating platform-optimized content...</div>
-            </div>
-        </div>
-    `);
+    // Step 4: GENERATE
+    addChatBubble('assistant', renderWorkflowStage('generate', trade));
 
     const biz = state.businessInfo;
     const topic = state.selectedTopicTitle;

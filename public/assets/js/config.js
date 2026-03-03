@@ -98,6 +98,53 @@ export const topicsByTrade = {
     ]
 };
 
+// Workflow stages with dynamic agents
+export const workflowStages = {
+    discover: {
+        name: 'DISCOVER',
+        icon: '🔍',
+        status: 'Analyzing local opportunities...',
+        agents: ['weather', 'localtrend', 'competitor']
+    },
+    analyze: {
+        name: 'ANALYZE',
+        icon: '💡',
+        status: 'Finding best angle for your audience...',
+        agents: ['plumber', 'seolocal']  // trade agent will be swapped dynamically
+    },
+    strategize: {
+        name: 'STRATEGIZE',
+        icon: '📊',
+        status: 'Selecting best platforms...',
+        agents: ['googlebiz', 'nextdoor', 'facebooklocal']
+    },
+    generate: {
+        name: 'GENERATE',
+        icon: '✍️',
+        status: 'Creating platform-optimized content...',
+        agents: ['homeprocopy', 'beforeafter']
+    }
+};
+
+// Get agent by ID
+export function getAgentById(id) {
+    return availableAgents.find(a => a.id === id) || { name: id, icon: '🤖' };
+}
+
+// Get workflow agents for a stage, with trade substitution
+export function getWorkflowAgents(stage, trade = 'plumber') {
+    const stageConfig = workflowStages[stage];
+    if (!stageConfig) return [];
+
+    return stageConfig.agents.map(agentId => {
+        // Swap trade-specific agent
+        if (['plumber', 'electrician', 'hvac', 'roofer', 'landscaper', 'realestate'].includes(agentId)) {
+            return getAgentById(trade);
+        }
+        return getAgentById(agentId);
+    });
+}
+
 // Quick prompts for demo
 export const quickPrompts = {
     start: "Hi! I want to create marketing content for my home service business. Help me get started.",
