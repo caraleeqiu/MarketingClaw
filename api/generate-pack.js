@@ -198,11 +198,10 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
 
     // Generate image with Gemini 3.1 Flash Image
     // Frontend will display same image but styled for each platform
-    console.log('Generating AI image with Gemini 3.1 Flash Image...');
-    console.log('Trade:', trade, 'Topic:', topic);
-    console.log('Image prompt:', imagePrompt);
+    let imageGenerated = false;
     try {
-      const response = await fetch(
+      console.log('Generating AI image with', IMAGE_MODEL);
+      const imgResponse = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${IMAGE_MODEL}:generateContent?key=${apiKey}`,
         {
           method: 'POST',
@@ -221,30 +220,36 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
           }),
         }
       );
-      if (response.ok) {
-        const data = await response.json();
-        const parts = data.candidates?.[0]?.content?.parts || [];
+
+      if (imgResponse.ok) {
+        const imgData = await imgResponse.json();
+        const parts = imgData.candidates?.[0]?.content?.parts || [];
         const imagePart = parts.find(p => p.inlineData);
         const base64 = imagePart?.inlineData?.data;
         const mimeType = imagePart?.inlineData?.mimeType || 'image/png';
+
         if (base64) {
           const imageUrl = `data:${mimeType};base64,${base64}`;
           contentPack.images.google = imageUrl;
           contentPack.images.nextdoor = imageUrl;
           contentPack.images.facebook = imageUrl;
-          console.log('Gemini 3.1 Flash Image SUCCESS');
+          imageGenerated = true;
+          console.log('AI image generated successfully');
+        } else {
+          console.log('No image data in response, using fallback');
         }
       } else {
-        console.error('Gemini Image error:', await response.text());
+        const errorText = await imgResponse.text();
+        console.error('Gemini Image API error:', imgResponse.status, errorText.substring(0, 200));
       }
     } catch (e) {
-      console.error('Image generation error:', e);
+      console.error('Image generation error:', e.message);
     }
 
-    console.log('Image generated with', IMAGE_MODEL + ':', !!contentPack.images.google);
+    console.log('Image generation result:', imageGenerated ? 'AI Generated' : 'Will use fallback');
 
-    // Fallback - use Topic + Trade based image selection
-    if (!contentPack.images.google) {
+    // Fallback - use Topic + Trade based image selection if AI image failed
+    if (!imageGenerated) {
       // Topic-based image keywords mapping
       const topicKeywords = {
         spring: ['spring', 'maintenance', 'inspection', 'seasonal', 'checkup'],
@@ -288,14 +293,32 @@ Generate content for Google Business, Nextdoor, and Facebook. Return ONLY valid 
         ]
       };
 
-      // Trade-specific default images (fallback) - [google/facebook, nextdoor]
+      // Trade-specific default images (fallback) - all using reliable Pexels URLs
       const tradeImages = {
-        plumber: ['/images/plumber-toilet-repair.jpg', '/images/plumber-hot-water.jpg'],
-        electrician: ['https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=800'],
-        hvac: ['https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&w=800'],
-        roofer: ['https://images.pexels.com/photos/8961001/pexels-photo-8961001.jpeg?auto=compress&w=800'],
-        landscaper: ['https://images.pexels.com/photos/1453499/pexels-photo-1453499.jpeg?auto=compress&w=800'],
-        realtor: ['https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&w=800']
+        plumber: [
+          'https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&w=800',
+          'https://images.pexels.com/photos/6419104/pexels-photo-6419104.jpeg?auto=compress&w=800'
+        ],
+        electrician: [
+          'https://images.pexels.com/photos/8005397/pexels-photo-8005397.jpeg?auto=compress&w=800',
+          'https://images.pexels.com/photos/8005368/pexels-photo-8005368.jpeg?auto=compress&w=800'
+        ],
+        hvac: [
+          'https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&w=800',
+          'https://images.pexels.com/photos/4489794/pexels-photo-4489794.jpeg?auto=compress&w=800'
+        ],
+        roofer: [
+          'https://images.pexels.com/photos/8961001/pexels-photo-8961001.jpeg?auto=compress&w=800',
+          'https://images.pexels.com/photos/8961251/pexels-photo-8961251.jpeg?auto=compress&w=800'
+        ],
+        landscaper: [
+          'https://images.pexels.com/photos/1453499/pexels-photo-1453499.jpeg?auto=compress&w=800',
+          'https://images.pexels.com/photos/1453497/pexels-photo-1453497.jpeg?auto=compress&w=800'
+        ],
+        realtor: [
+          'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&w=800',
+          'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&w=800'
+        ]
       };
 
       // Detect topic type from BOTH the topic string AND the actual generated content
