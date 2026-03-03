@@ -78,13 +78,32 @@
                 <div class="welcome-icon">🏠🔧</div>
                 <h2>Hi! I'm MarketingClaw</h2>
                 <p>Your AI marketing assistant for home service professionals.</p>
-                <p style="color: var(--text-secondary); margin-top: 20px; font-size: 15px;">Just say <strong>"hi"</strong> or tell me about your business to get started!</p>
 
-                <!-- Example prompts -->
+                <!-- Two Flow Entry Points -->
+                <div style="margin-top: 40px; display: flex; flex-direction: column; gap: 16px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                    <p style="font-size: 15px; color: var(--text-secondary); margin-bottom: 8px;">What would you like to do?</p>
+
+                    <button class="flow-entry-btn" onclick="window.startFlow('promote')" style="display: flex; align-items: center; gap: 16px; padding: 20px 24px; background: linear-gradient(135deg, var(--primary), #FF8F6B); color: white; border: none; border-radius: 16px; cursor: pointer; text-align: left; transition: transform 0.2s, box-shadow 0.2s;">
+                        <span style="font-size: 32px;">📣</span>
+                        <div>
+                            <div style="font-size: 18px; font-weight: 700;">Get More Customers</div>
+                            <div style="font-size: 13px; opacity: 0.9;">Create marketing posts for social media</div>
+                        </div>
+                    </button>
+
+                    <button class="flow-entry-btn" onclick="window.startFlow('referral')" style="display: flex; align-items: center; gap: 16px; padding: 20px 24px; background: linear-gradient(135deg, #25D366, #128C7E); color: white; border: none; border-radius: 16px; cursor: pointer; text-align: left; transition: transform 0.2s, box-shadow 0.2s;">
+                        <span style="font-size: 32px;">📱</span>
+                        <div>
+                            <div style="font-size: 18px; font-weight: 700;">Share & Get Reviews</div>
+                            <div style="font-size: 13px; opacity: 0.9;">Send job photos via WhatsApp, get 5-star reviews</div>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Example prompts (for promote flow) -->
                 <div style="margin-top: 30px;">
-                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">💡 Example messages:</p>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">💡 Or just tell me about your business:</p>
                     <div style="display: flex; flex-direction: column; gap: 8px; max-width: 400px; margin: 0 auto;">
-                        <div class="example-msg" onclick="useExample(this)">"Hi, I need help with marketing"</div>
                         <div class="example-msg" onclick="useExample(this)">"I'm a plumber in Seattle looking for more customers"</div>
                         <div class="example-msg" onclick="useExample(this)">"Help me create a Google Business post"</div>
                     </div>

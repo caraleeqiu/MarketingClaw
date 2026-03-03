@@ -23,6 +23,9 @@ export const availableAgents = [
     { id: 'nextdoor', name: 'Nextdoor Pro', icon: '🏘️' },
     { id: 'facebooklocal', name: 'Facebook Local', icon: '📘' },
     { id: 'thumbtack', name: 'Thumbtack Pro', icon: '📌' },
+    // WhatsApp & Referral
+    { id: 'whatsapp-referral', name: 'WhatsApp Referral', icon: '📱', featured: true,
+      description: 'Turn completed jobs into 5-star reviews & new customer referrals. Send job photos, request reviews, auto-generate referral codes.' },
     // Industry
     { id: 'plumber', name: 'Plumber AI', icon: '🔧' },
     { id: 'electrician', name: 'Electrician AI', icon: '⚡' },

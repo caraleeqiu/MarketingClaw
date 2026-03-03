@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NearBy - Pitch Deck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .deck {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+        }
+
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 120px;
+            position: relative;
+        }
+
+        /* Slide 1: Title */
+        .slide-title {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+
+        .slide-title .logo {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+
+        .slide-title h1 {
+            font-size: 96px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #FF6B35, #FF8F6B, #FFB88C);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+        }
+
+        .slide-title .tagline {
+            font-size: 36px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 60px;
+        }
+
+        .slide-title .subtitle {
+            font-size: 24px;
+            color: #888;
+            max-width: 700px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* Slide 2: Story */
+        .slide-story {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a7b 100%);
+            text-align: left;
+            align-items: flex-start;
+        }
+
+        .slide-story .story-header {
+            font-size: 18px;
+            color: #FF8F6B;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+        }
+
+        .slide-story h2 {
+            font-size: 52px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            line-height: 1.2;
+        }
+
+        .slide-story .story-text {
+            font-size: 26px;
+            line-height: 1.8;
+            color: #d0d0d0;
+            max-width: 900px;
+        }
+
+        .slide-story .highlight {
+            color: #FF8F6B;
+            font-weight: 600;
+        }
+
+        .slide-story .quote {
+            margin-top: 50px;
+            padding: 30px 40px;
+            background: rgba(255, 107, 53, 0.1);
+            border-left: 4px solid #FF6B35;
+            font-size: 28px;
+            font-style: italic;
+            color: #fff;
+        }
+
+        /* Slide 3: Problem */
+        .slide-problem {
+            background: linear-gradient(135deg, #2d1f3d 0%, #1a1a2e 100%);
+        }
+
+        .slide-problem .section-label {
+            font-size: 16px;
+            color: #FF6B35;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+
+        .slide-problem h2 {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 60px;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .problem-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .problem-card .stat {
+            font-size: 64px;
+            font-weight: 900;
+            color: #FF6B35;
+            margin-bottom: 16px;
+        }
+
+        .problem-card .label {
+            font-size: 20px;
+            color: #888;
+            margin-bottom: 16px;
+        }
+
+        .problem-card .desc {
+            font-size: 18px;
+            color: #d0d0d0;
+            line-height: 1.5;
+        }
+
+        /* Slide 4: Market */
+        .slide-market {
+            background: linear-gradient(135deg, #0d2137 0%, #1a3a5c 100%);
+        }
+
+        .slide-market h2 {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 60px;
+        }
+
+        .market-visual {
+            display: flex;
+            align-items: center;
+            gap: 80px;
+        }
+
+        .market-circles {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circle-tam {
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 107, 53, 0.15);
+            border: 2px solid rgba(255, 107, 53, 0.3);
+            top: 0;
+            left: 0;
+        }
+
+        .circle-sam {
+            width: 280px;
+            height: 280px;
+            background: rgba(255, 107, 53, 0.25);
+            border: 2px solid rgba(255, 107, 53, 0.5);
+            top: 60px;
+            left: 60px;
+        }
+
+        .circle-som {
+            width: 140px;
+            height: 140px;
+            background: rgba(255, 107, 53, 0.5);
+            border: 2px solid #FF6B35;
+            top: 130px;
+            left: 130px;
+        }
+
+        .market-details {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .market-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .market-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .market-item .value {
+            font-size: 42px;
+            font-weight: 800;
+            color: #FF6B35;
+            min-width: 160px;
+        }
+
+        .market-item .info {
+            font-size: 20px;
+            color: #d0d0d0;
+        }
+
+        .market-item .info strong {
+            color: #fff;
+            display: block;
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        /* Slide 5: Solution */
+        .slide-solution {
+            background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        }
+
+        .slide-solution h2 {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .slide-solution .subtitle {
+            font-size: 28px;
+            color: #888;
+            margin-bottom: 60px;
+        }
+
+        .solution-flow {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .solution-step {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px 50px;
+            text-align: center;
+        }
+
+        .solution-step .icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+        }
+
+        .solution-step .title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .solution-step .desc {
+            font-size: 16px;
+            color: #888;
+        }
+
+        .arrow {
+            font-size: 36px;
+            color: #FF6B35;
+        }
+
+        .platforms {
+            display: flex;
+            gap: 40px;
+        }
+
+        .platform {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 20px;
+        }
+
+        .platform .p-icon {
+            font-size: 28px;
+        }
+
+        /* Slide 6: Ask */
+        .slide-ask {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+
+        .slide-ask h2 {
+            font-size: 64px;
+            font-weight: 800;
+            margin-bottom: 60px;
+        }
+
+        .ask-content {
+            display: flex;
+            gap: 80px;
+            align-items: flex-start;
+        }
+
+        .ask-box {
+            background: rgba(255, 107, 53, 0.1);
+            border: 2px solid #FF6B35;
+            border-radius: 24px;
+            padding: 50px 60px;
+            text-align: center;
+        }
+
+        .ask-box .amount {
+            font-size: 72px;
+            font-weight: 900;
+            color: #FF6B35;
+            margin-bottom: 16px;
+        }
+
+        .ask-box .type {
+            font-size: 24px;
+            color: #d0d0d0;
+        }
+
+        .use-of-funds {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .use-of-funds h3 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #d0d0d0;
+        }
+
+        .fund-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .fund-bar {
+            height: 12px;
+            background: #FF6B35;
+            border-radius: 6px;
+        }
+
+        .fund-item .label {
+            font-size: 18px;
+            min-width: 200px;
+        }
+
+        .fund-item .percent {
+            font-size: 18px;
+            color: #FF6B35;
+            font-weight: 600;
+        }
+
+        .cta {
+            margin-top: 60px;
+            padding: 24px 60px;
+            background: linear-gradient(135deg, #FF6B35, #FF8F6B);
+            border: none;
+            border-radius: 16px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-dot.active {
+            background: #FF6B35;
+            transform: scale(1.3);
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Print styles for PDF export */
+        @media print {
+            .deck {
+                overflow: visible;
+                display: block;
+            }
+            .slide {
+                page-break-after: always;
+                min-height: 100vh;
+            }
+            .nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="deck" id="deck">
+        <!-- Slide 1: Title -->
+        <section class="slide slide-title">
+            <div class="logo">🏠</div>
+            <h1>NearBy</h1>
+            <div class="tagline">One Photo. Three Channels. Zero Effort.</div>
+            <div class="subtitle">AI-Powered Local Marketing for Home Service Professionals</div>
+            <div class="slide-number">1 / 6</div>
+        </section>
+
+        <!-- Slide 2: Story -->
+        <section class="slide slide-story">
+            <div class="story-header">The Story</div>
+            <h2>Meet John, a master plumber<br>in Austin, Texas.</h2>
+            <div class="story-text">
+                John has been fixing pipes for <span class="highlight">15 years</span>. His customers love him.
+                <br><br>
+                But every month, he spends <span class="highlight">$2,000+ on lead generation</span> through platforms that charge per click, per call, per lead.
+                <br><br>
+                He knows he should post on Google Business, Nextdoor, and Facebook.
+                His competitors do. But after a 10-hour day crawling under houses,
+                <span class="highlight">who has time to become a marketing expert?</span>
+            </div>
+            <div class="quote">
+                "I'm great at fixing pipes. I'm terrible at social media."
+            </div>
+            <div class="slide-number">2 / 6</div>
+        </section>
+
+        <!-- Slide 3: Problem -->
+        <section class="slide slide-problem">
+            <div class="section-label">The Problem</div>
+            <h2>Local Marketing is Broken</h2>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="stat">$100+</div>
+                    <div class="label">Cost Per Lead</div>
+                    <div class="desc">Lead platforms charge premium prices for basic customer connections</div>
+                </div>
+                <div class="problem-card">
+                    <div class="stat">65%</div>
+                    <div class="label">Still Offline</div>
+                    <div class="desc">Majority of tradespeople have zero social media presence</div>
+                </div>
+                <div class="problem-card">
+                    <div class="stat">3+</div>
+                    <div class="label">Platforms to Manage</div>
+                    <div class="desc">Google, Nextdoor, Facebook all require different formats & strategies</div>
+                </div>
+            </div>
+            <div class="slide-number">3 / 6</div>
+        </section>
+
+        <!-- Slide 4: Market -->
+        <section class="slide slide-market">
+            <div class="section-label" style="color: #FF6B35; text-transform: uppercase; letter-spacing: 3px; font-size: 16px; margin-bottom: 20px;">Market Opportunity</div>
+            <h2>A Massive, Underserved Market</h2>
+            <div class="market-visual">
+                <div class="market-circles">
+                    <div class="circle circle-tam"></div>
+                    <div class="circle circle-sam"></div>
+                    <div class="circle circle-som"></div>
+                </div>
+                <div class="market-details">
+                    <div class="market-item">
+                        <div class="market-dot" style="background: rgba(255, 107, 53, 0.3);"></div>
+                        <div class="value">$870B</div>
+                        <div class="info">
+                            <strong>TAM</strong>
+                            US Home Services Market
+                        </div>
+                    </div>
+                    <div class="market-item">
+                        <div class="market-dot" style="background: rgba(255, 107, 53, 0.5);"></div>
+                        <div class="value">$12B</div>
+                        <div class="info">
+                            <strong>SAM</strong>
+                            SMB Marketing Spend (Trades)
+                        </div>
+                    </div>
+                    <div class="market-item">
+                        <div class="market-dot" style="background: #FF6B35;"></div>
+                        <div class="value">$500M</div>
+                        <div class="info">
+                            <strong>SOM</strong>
+                            AI Marketing Tools for Trades
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">4 / 6</div>
+        </section>
+
+        <!-- Slide 5: Solution -->
+        <section class="slide slide-solution">
+            <div class="section-label" style="color: #FF6B35; text-transform: uppercase; letter-spacing: 3px; font-size: 16px; margin-bottom: 20px;">Our Solution</div>
+            <h2>NearBy: AI Marketing Made Simple</h2>
+            <div class="subtitle">From job site photo to published content in 60 seconds</div>
+            <div class="solution-flow">
+                <div class="solution-step">
+                    <div class="icon">📸</div>
+                    <div class="title">Snap a Photo</div>
+                    <div class="desc">Take a picture of your work</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="solution-step">
+                    <div class="icon">🤖</div>
+                    <div class="title">AI Generates</div>
+                    <div class="desc">Platform-optimized content</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="solution-step">
+                    <div class="icon">🚀</div>
+                    <div class="title">One-Click Publish</div>
+                    <div class="desc">To all your channels</div>
+                </div>
+            </div>
+            <div class="platforms">
+                <div class="platform"><span class="p-icon">📍</span> Google Business</div>
+                <div class="platform"><span class="p-icon">🏘️</span> Nextdoor</div>
+                <div class="platform"><span class="p-icon">📘</span> Facebook</div>
+                <div class="platform"><span class="p-icon">📸</span> Instagram</div>
+            </div>
+            <div class="slide-number">5 / 6</div>
+        </section>
+
+        <!-- Slide 6: Ask -->
+        <section class="slide slide-ask">
+            <div class="section-label" style="color: #FF6B35; text-transform: uppercase; letter-spacing: 3px; font-size: 16px; margin-bottom: 20px;">The Ask</div>
+            <h2>Join Us in Empowering Local Trades</h2>
+            <div class="ask-content">
+                <div class="ask-box">
+                    <div class="amount">$500K</div>
+                    <div class="type">Seed Round</div>
+                </div>
+                <div class="use-of-funds">
+                    <h3>Use of Funds</h3>
+                    <div class="fund-item">
+                        <div class="fund-bar" style="width: 200px;"></div>
+                        <span class="label">Product Development</span>
+                        <span class="percent">50%</span>
+                    </div>
+                    <div class="fund-item">
+                        <div class="fund-bar" style="width: 120px;"></div>
+                        <span class="label">Go-to-Market</span>
+                        <span class="percent">30%</span>
+                    </div>
+                    <div class="fund-item">
+                        <div class="fund-bar" style="width: 80px;"></div>
+                        <span class="label">Operations</span>
+                        <span class="percent">20%</span>
+                    </div>
+                </div>
+            </div>
+            <button class="cta">Let's Talk → team@nearby.ai</button>
+            <div class="slide-number">6 / 6</div>
+        </section>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav" id="nav"></nav>
+
+    <script>
+        const deck = document.getElementById('deck');
+        const slides = document.querySelectorAll('.slide');
+        const nav = document.getElementById('nav');
+
+        // Create nav dots
+        slides.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+            dot.onclick = () => {
+                slides[i].scrollIntoView({ behavior: 'smooth' });
+            };
+            nav.appendChild(dot);
+        });
+
+        // Update active dot on scroll
+        deck.addEventListener('scroll', () => {
+            const scrollPos = deck.scrollLeft;
+            const slideWidth = window.innerWidth;
+            const currentSlide = Math.round(scrollPos / slideWidth);
+
+            document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const scrollPos = deck.scrollLeft;
+            const slideWidth = window.innerWidth;
+            const currentSlide = Math.round(scrollPos / slideWidth);
+
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                if (currentSlide < slides.length - 1) {
+                    slides[currentSlide + 1].scrollIntoView({ behavior: 'smooth' });
+                }
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                if (currentSlide > 0) {
+                    slides[currentSlide - 1].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

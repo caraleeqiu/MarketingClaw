@@ -12,6 +12,7 @@ import { sendMessage, generateContentPack, regenerateImage } from './api-client.
 import './modals.js';  // Auto-registers window functions
 import './preview-renders.js';  // Auto-registers window functions
 import './utils.js';  // Auto-registers window functions
+import './referral-flow.js';  // WhatsApp Referral flow
 
 // Initialize app
 function init() {
